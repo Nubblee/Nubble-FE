@@ -134,31 +134,31 @@ const GlobalStyles = () => (
 			}
 			p,
 			h1 {
-				font-size: 2.5em;
-				font-weight: 600;
+				font-size: ${fontSize.xxxxxl};
+				font-weight: ${fontWeight.semiBold};
 				margin: 0.67em 0;
 			}
 			h2 {
-				font-size: 2em;
-				font-weight: 600;
+				font-size: ${fontSize.xxxxl};
+				font-weight: ${fontWeight.semiBold};
 				margin: 0.67em 0;
 			}
 			h3 {
-				font-size: 1.5em;
-				font-weight: 600;
+				font-size: ${fontSize.xxl};
+				font-weight: ${fontWeight.semiBold};
 				margin: 0.75em 0;
 			}
 			h4 {
-				font-size: 1em;
-				font-weight: 600;
+				font-size: ${fontSize.lg};
+				font-weight: ${fontWeight.semiBold};
 				margin: 0.75em 0;
 			}
 			blockquote {
-				background-color: '#3d3d3d';
-				padding: '1px 15px';
+				background-color: ${colors.mainGray};
+				padding: 1px 15px;
 			}
 			pre {
-				background-color: '#3d3d3d';
+				background-color: ${colors.mainGray};
 				padding: 1em;
 				margin-bottom: 20px;
 			}
