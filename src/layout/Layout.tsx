@@ -15,7 +15,6 @@ const Layout: React.FC = () => {
 			<main>
 				<Outlet /> {/* 중첩된 라우트 렌더링 */}
 			</main>
-			<footer>Footer</footer>
 		</div>
 	)
 }
