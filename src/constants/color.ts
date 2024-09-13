@@ -1,5 +1,6 @@
 const colors = {
 	primaryBlue: '#ACC1EB',
+	hoverBlue: '#7593CF',
 	mainBlack: '#0C0C0C',
 	bgBlack: '#1F1F1F',
 	mainGray: '#3D3D3D',
