@@ -1,5 +1,5 @@
 import styled from '@emotion/styled'
-import React, { ReactNode } from 'react'
+import React, { ButtonHTMLAttributes, ReactNode } from 'react'
 import colors from '../constants/color'
 import { fontSize, fontWeight } from '../constants/font'
 import { Link } from 'react-router-dom'
@@ -7,13 +7,14 @@ import { Link } from 'react-router-dom'
 type ButtonVariant = 'primary' | 'secondary'
 type ButtonSize = 'sm' | 'md'
 
-export interface ButtonProps {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	children: ReactNode
 	variant?: ButtonVariant
 	size?: ButtonSize
 	radius?: number
 	disabled?: boolean
 	to?: string
+
 	onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void
 }
 
@@ -25,10 +26,11 @@ const Button = ({
 	disabled = false,
 	to,
 	onClick,
+	...props
 }: ButtonProps) => {
 	return to && !disabled ? (
 		<Link to={to}>
-			<ButtonComponent variant={variant} radius={radius} disabled={disabled} size={size}>
+			<ButtonComponent variant={variant} radius={radius} disabled={disabled} size={size} {...props}>
 				{children}
 			</ButtonComponent>
 		</Link>
