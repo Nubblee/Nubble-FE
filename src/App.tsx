@@ -7,7 +7,6 @@ const App = () => {
 		<div>
 			<GlobalStyles />
 			<RouterProvider router={router} />
-			<p>App</p>
 		</div>
 	)
 }
