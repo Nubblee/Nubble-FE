@@ -10,18 +10,11 @@ const GlobalStyles = () => (
 			body,
 			div,
 			span,
+			h5,
+			h6,
 			applet,
 			object,
 			iframe,
-			h1,
-			h2,
-			h3,
-			h4,
-			h5,
-			h6,
-			p,
-			blockquote,
-			pre,
 			a,
 			abbr,
 			acronym,
@@ -86,10 +79,12 @@ const GlobalStyles = () => (
 			time,
 			mark,
 			audio,
-			video {
+			video,
+			button {
 				margin: 0;
 				padding: 0;
 				border: 0;
+				border-radius: 0;
 				font-size: 100%;
 				font: inherit;
 				vertical-align: baseline;
@@ -136,6 +131,36 @@ const GlobalStyles = () => (
 			* {
 				box-sizing: border-box;
 				margin: 0;
+			}
+			p,
+			h1 {
+				font-size: ${fontSize.xxxxxl};
+				font-weight: ${fontWeight.semiBold};
+				margin: 0.67em 0;
+			}
+			h2 {
+				font-size: ${fontSize.xxxxl};
+				font-weight: ${fontWeight.semiBold};
+				margin: 0.67em 0;
+			}
+			h3 {
+				font-size: ${fontSize.xxl};
+				font-weight: ${fontWeight.semiBold};
+				margin: 0.75em 0;
+			}
+			h4 {
+				font-size: ${fontSize.lg};
+				font-weight: ${fontWeight.semiBold};
+				margin: 0.75em 0;
+			}
+			blockquote {
+				background-color: ${colors.mainGray};
+				padding: 1px 15px;
+			}
+			pre {
+				background-color: ${colors.mainGray};
+				padding: 1em;
+				margin-bottom: 20px;
 			}
 			#root {
 				width: 100%;
