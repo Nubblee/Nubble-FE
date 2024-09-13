@@ -8,12 +8,12 @@ const Login: React.FC = () => {
 	return (
 		<Container>
 			<Logo logoWidth={360} />
-			<span>Enter your account details</span>
+			<span>로그인 정보를 입력해주세요.</span>
 			<form className="form-container" onSubmit={() => {}}>
-				<input type="text" name="userName" placeholder="Username" />
-				<input type="password" name="password" placeholder="Password" />
+				<input type="text" name="userName" placeholder="아이디" />
+				<input type="password" name="password" placeholder="비밀번호" />
 				<button type="submit" className="login-btn">
-					Login
+					로그인
 				</button>
 			</form>
 		</Container>
