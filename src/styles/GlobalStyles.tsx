@@ -89,6 +89,10 @@ const GlobalStyles = () => (
 				font: inherit;
 				vertical-align: baseline;
 			}
+			,
+			button {
+				cursor: pointer;
+			}
 			article,
 			aside,
 			details,
