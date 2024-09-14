@@ -1,5 +1,6 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import React from 'react'
+import Header from '@components/Header'
 
 const Layout: React.FC = () => {
 	const location = useLocation()
@@ -12,7 +13,7 @@ const Layout: React.FC = () => {
 
 	return (
 		<div>
-			{!hideHeader && <header>Header</header>} {/* 조건에 따라 헤더 표시 */}
+			{!hideHeader && <Header />} {/* 조건에 따라 헤더 표시 */}
 			<main>
 				<Outlet /> {/* 중첩된 라우트 렌더링 */}
 			</main>
