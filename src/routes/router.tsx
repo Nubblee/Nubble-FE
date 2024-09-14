@@ -3,6 +3,7 @@ import Layout from '@/layout/Layout'
 import ErrorPage from '@/pages/ErrorPage'
 import Home from '@/pages/Home'
 import Login from '@/pages/Login'
+import PostDetail from '@/pages/PostDetail'
 
 export const router = createBrowserRouter([
 	{
@@ -18,6 +19,7 @@ export const router = createBrowserRouter([
 				path: '/login',
 				element: <Login />, // 로그인 페이지 (헤더 없음)
 			},
+			{ path: '/postDetail', element: <PostDetail /> },
 		],
 	},
 ])
