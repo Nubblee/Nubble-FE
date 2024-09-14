@@ -1,14 +1,16 @@
-import CommentForm from '@components/comment/commentForm'
+import CommentForm from '@components/comment/CommentForm'
+import CommentList from '@components/comment/CommentList'
 import FloatingMenu from '@components/FloatingMenu'
 import styled from '@emotion/styled'
 
-const PostDetail: React.FC = () => {
+const PostDetail = () => {
 	return (
 		<Container>
 			<FloatingMenu />
 			<Wrapper>
 				<h1>글 상세내용 페이지</h1>
 				<CommentForm />
+				<CommentList />
 			</Wrapper>
 		</Container>
 	)
