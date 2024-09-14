@@ -1,6 +1,7 @@
 import styled from '@emotion/styled'
 import colors from '@/constants/color'
 import { fontSize, fontWeight } from '@/constants/font'
+import { Trash2 } from 'lucide-react'
 
 // 댓글 데이터의 타입을 정의
 interface Comment {
@@ -35,7 +36,10 @@ const CommentItem = ({ comment }: { comment: Comment }) => {
 			</Header>
 			<Content>{comment.content}</Content>
 			<ActionButtons>
-				<button>삭제</button>
+				<DeleteButton>
+					<Trash2 size={14} />
+					<span>삭제</span>
+				</DeleteButton>
 			</ActionButtons>
 		</Item>
 	)
@@ -84,14 +88,23 @@ const Content = styled.p`
 const ActionButtons = styled.div`
 	display: flex;
 	justify-content: flex-end;
-	button {
-		background: none;
-		border: none;
-		color: ${colors.deleteGray};
-		cursor: pointer;
-		&:hover {
-			color: ${colors.white};
-		}
+`
+
+const DeleteButton = styled.button`
+	display: flex;
+	align-items: center;
+	font-size: 14px;
+	gap: 5px;
+	background: none;
+	border: none;
+	color: ${colors.deleteGray};
+	cursor: pointer;
+	&:hover {
+		color: ${colors.white};
+	}
+
+	svg {
+		color: inherit; /* 부모의 컬러를 따르도록 설정 */
 	}
 `
 
