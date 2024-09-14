@@ -5,6 +5,7 @@ import Home from '@/pages/Home'
 import Login from '@/pages/Login'
 import PostDetail from '@/pages/PostDetail'
 import Saves from '@/pages/Saves'
+import WritePage from '@/pages/WritePage'
 
 export const router = createBrowserRouter([
 	{
@@ -24,6 +25,10 @@ export const router = createBrowserRouter([
 			{
 				path: '/saves',
 				element: <Saves />,
+			},
+			{
+				path: '/write',
+				element: <WritePage />, // 로그인 페이지 (헤더 없음)
 			},
 		],
 	},
