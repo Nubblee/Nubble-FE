@@ -81,7 +81,8 @@ const GlobalStyles = () => (
 			audio,
 			video,
 			button,
-			input {
+			input,
+			p {
 				margin: 0;
 				padding: 0;
 				border: 0;
@@ -137,7 +138,6 @@ const GlobalStyles = () => (
 				box-sizing: border-box;
 				margin: 0;
 			}
-			p,
 			h1 {
 				font-size: ${fontSize.xxxxxl};
 				font-weight: ${fontWeight.semiBold};
@@ -160,7 +160,7 @@ const GlobalStyles = () => (
 			}
 			blockquote {
 				background-color: ${colors.mainGray};
-				padding: 1px 15px;
+				padding: 10px 15px;
 			}
 			pre {
 				background-color: ${colors.mainGray};

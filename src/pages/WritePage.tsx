@@ -4,10 +4,12 @@ import styled from '@emotion/styled'
 import colors from '@/constants/color'
 import { fontSize, fontWeight } from '@/constants/font'
 import Button from '@components/Button'
+import RenderMarkdown from '@components/RenderMarkdown'
 
 const WritePage = () => {
 	const fileRef = useRef<HTMLInputElement>(null)
 	const [markdownText, setMarkdownText] = useState('')
+	const [title, setTitle] = useState('')
 
 	const handleUploadFile = () => {
 		if (fileRef.current) {
@@ -22,7 +24,13 @@ const WritePage = () => {
 	return (
 		<Container>
 			<div className="area-write">
-				<input className="write-title" type="text" placeholder="제목을 입력하세요" />
+				<input
+					className="write-title"
+					type="text"
+					value={title}
+					onChange={(e) => setTitle(e.target.value)}
+					placeholder="제목을 입력하세요"
+				/>
 				<div className="gray-line" />
 				<div className="area-choice">
 					<input type="file" multiple ref={fileRef} style={{ display: 'none' }} />
@@ -51,7 +59,10 @@ const WritePage = () => {
 					</div>
 				</div>
 			</div>
-			<div className="area-read">작성 내용 확인 영역</div>
+			<div className="area-read">
+				<div className="title">{title}</div>
+				<RenderMarkdown markdown={markdownText} />
+			</div>
 		</Container>
 	)
 }
@@ -74,7 +85,7 @@ const Container = styled.div`
 			width: 100%;
 			font-size: ${fontSize.xxxxxl};
 			font-weight: ${fontWeight.semiBold};
-			background-color: ${colors.bgBlack};
+			background-color: inherit;
 			outline: none;
 			color: ${colors.white};
 			margin: 30px 0px;
@@ -121,7 +132,18 @@ const Container = styled.div`
 
 	.area-read {
 		width: 100%;
+		overflow-y: auto;
+		flex-direction: column;
+		padding: 40px;
+		line-height: 1.3;
 		background-color: ${colors.mainBlack};
+		font-size: ${fontSize.md};
+
+		.title {
+			font-size: ${fontSize.xxxxxl};
+			font-weight: ${fontWeight.semiBold};
+			margin-bottom: 50px;
+		}
 	}
 
 	.area-footer {
