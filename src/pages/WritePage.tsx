@@ -5,11 +5,37 @@ import colors from '@/constants/color'
 import { fontSize, fontWeight } from '@/constants/font'
 import Button from '@components/Button'
 import RenderMarkdown from '@components/RenderMarkdown'
+import SelectBox from '@components/SelectBox'
+
+const selectData = [
+	{
+		key: 'study',
+		value: '스터디',
+	},
+	{
+		key: 'cote',
+		value: '코딩테스트',
+	},
+]
+
+const subData = {
+	study: [
+		{ key: 'cs', value: 'CS' },
+		{ key: 'Algorithm', value: '알고리즘' },
+	],
+	cote: [
+		{ key: 'lv0', value: 'LV.0' },
+		{ key: 'lv1', value: 'LV.1' },
+		{ key: 'lv2', value: 'LV.2' },
+	],
+}
 
 const WritePage = () => {
 	const fileRef = useRef<HTMLInputElement>(null)
 	const [markdownText, setMarkdownText] = useState('')
 	const [title, setTitle] = useState('')
+	const [selectedCategory, setSelectedCategory] = useState<string>('')
+	const [selectedSubCategory, setSelectedSubCategory] = useState<string>('')
 
 	const handleUploadFile = () => {
 		if (fileRef.current) {
@@ -19,6 +45,15 @@ const WritePage = () => {
 
 	const handleContent = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setMarkdownText(e.target.value)
+	}
+
+	const handleSelectedData = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		setSelectedCategory(e.target.value)
+		setSelectedSubCategory('')
+	}
+
+	const handleSubData = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		setSelectedSubCategory(e.target.value)
 	}
 
 	return (
@@ -38,7 +73,21 @@ const WritePage = () => {
 						<ImagePlus size={30} />
 						이미지 업로드
 					</IconButton>
-					<div className="section-selectbox">셀렉트박스</div>
+					<div className="select-category">
+						<SelectBox
+							options={selectData}
+							selectedValue={selectedCategory}
+							placeholder="카테고리 선택"
+							handleChange={handleSelectedData}
+						/>
+						<SelectBox
+							options={selectedCategory ? subData[selectedCategory as keyof typeof subData] : []}
+							selectedValue={selectedSubCategory}
+							placeholder="내용 선택"
+							handleChange={handleSubData}
+							disabled={!selectedCategory}
+						/>
+					</div>
 				</div>
 				<textarea
 					className="content"
@@ -95,6 +144,11 @@ const Container = styled.div`
 			color: ${colors.commentGray};
 		}
 
+		textarea {
+			border: none;
+			outline: none;
+		}
+
 		.content {
 			width: 100%;
 			overflow-y: auto;
@@ -122,6 +176,11 @@ const Container = styled.div`
 
 	.area-choice {
 		margin: 10px 0 20px;
+
+		.select-category {
+			display: flex;
+			gap: 10px;
+		}
 	}
 
 	.area-exit {
