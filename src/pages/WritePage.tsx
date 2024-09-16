@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ImagePlus, ArrowLeft } from 'lucide-react'
 import styled from '@emotion/styled'
 import colors from '@/constants/color'
@@ -12,26 +13,18 @@ const selectData = [
 		key: 'study',
 		value: '스터디',
 	},
-	{
-		key: 'cote',
-		value: '코딩테스트',
-	},
 ]
-
 const subData = {
 	study: [
 		{ key: 'cs', value: 'CS' },
 		{ key: 'Algorithm', value: '알고리즘' },
 	],
-	cote: [
-		{ key: 'lv0', value: 'LV.0' },
-		{ key: 'lv1', value: 'LV.1' },
-		{ key: 'lv2', value: 'LV.2' },
-	],
 }
 
 const WritePage = () => {
+	const navigate = useNavigate()
 	const fileRef = useRef<HTMLInputElement>(null)
+	const readRef = useRef<HTMLDivElement>(null)
 	const [markdownText, setMarkdownText] = useState('')
 	const [title, setTitle] = useState('')
 	const [selectedCategory, setSelectedCategory] = useState<string>('')
@@ -43,8 +36,36 @@ const WritePage = () => {
 		}
 	}
 
+	const handleBack = (e: React.MouseEvent) => {
+		e.preventDefault()
+		navigate(-1)
+	}
+
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const files = e.target.files
+		if (files) {
+			const newImages = Array.from(files).map((file) => {
+				const url = URL.createObjectURL(file)
+				return `![](${url})`
+			})
+			setMarkdownText((prev) => prev + newImages.join('\n'))
+		}
+	}
+
 	const handleContent = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		setMarkdownText(e.target.value)
+		const imageRegex = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp|svg))/gi //복붙한 http 형식의 이미지 링크 렌더링 시킬 수 있도록 추가
+		let content = e.target.value
+		content = content.replace(imageRegex, (url) => {
+			if (!content.includes(`![](${url})`)) {
+				return `![](${url})`
+			}
+			return url
+		})
+		setMarkdownText(content)
+
+		if (readRef.current) {
+			readRef.current.scrollTop = readRef.current.scrollHeight
+		}
 	}
 
 	const handleSelectedData = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -68,7 +89,13 @@ const WritePage = () => {
 				/>
 				<div className="gray-line" />
 				<div className="area-choice">
-					<input type="file" multiple ref={fileRef} style={{ display: 'none' }} />
+					<input
+						type="file"
+						multiple
+						ref={fileRef}
+						style={{ display: 'none' }}
+						onChange={handleFileChange}
+					/>
 					<IconButton onClick={handleUploadFile}>
 						<ImagePlus size={30} />
 						이미지 업로드
@@ -96,7 +123,7 @@ const WritePage = () => {
 					onChange={handleContent}
 				/>
 				<div className="area-footer">
-					<IconButton>
+					<IconButton onClick={handleBack}>
 						<ArrowLeft size={25} />
 						나가기
 					</IconButton>
@@ -108,7 +135,7 @@ const WritePage = () => {
 					</div>
 				</div>
 			</div>
-			<div className="area-read">
+			<div ref={readRef} className="area-read">
 				<div className="title">{title}</div>
 				<RenderMarkdown markdown={markdownText} />
 			</div>
@@ -123,6 +150,26 @@ const Container = styled.div`
 	height: 100vh;
 	display: flex;
 
+	input::placeholder {
+		color: ${colors.commentGray};
+	}
+
+	.content,
+	.write-title {
+		color: ${colors.white};
+	}
+
+	.content::-webkit-scrollbar,
+	.area-read::-webkit-scrollbar {
+		width: 8px;
+	}
+
+	.content::-webkit-scrollbar-thumb,
+	.area-read::-webkit-scrollbar-thumb {
+		background-color: ${colors.white};
+		border-radius: 4px;
+	}
+
 	.area-write {
 		position: relative;
 		width: 100%;
@@ -136,12 +183,7 @@ const Container = styled.div`
 			font-weight: ${fontWeight.semiBold};
 			background-color: inherit;
 			outline: none;
-			color: ${colors.white};
-			margin: 30px 0px;
-		}
-
-		input::placeholder {
-			color: ${colors.commentGray};
+			margin: 40px 0px 30px;
 		}
 
 		textarea {
@@ -152,12 +194,12 @@ const Container = styled.div`
 		.content {
 			width: 100%;
 			overflow-y: auto;
+			font-size: ${fontSize.lg};
 			background-color: inherit;
-			color: ${colors.commentGray};
 			border: none;
 			padding: 10px;
 			resize: none;
-			height: calc(100vh - 250px);
+			height: calc(100vh - 260px);
 		}
 	}
 
@@ -175,7 +217,7 @@ const Container = styled.div`
 	}
 
 	.area-choice {
-		margin: 10px 0 20px;
+		margin: 20px 0;
 
 		.select-category {
 			display: flex;
