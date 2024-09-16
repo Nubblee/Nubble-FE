@@ -25,6 +25,7 @@ const RenderMarkdown = ({ markdown }: MarkdownProps) => {
 				children={markdown}
 				remarkPlugins={[remarkGfm, remarkBreaks]} // github에서 제공, 테이블이, 링크, 체크리스트 등이 추가된 플러그인
 				rehypePlugins={[rehypeRaw]} // <html 태그 사용할 수 있도록 하는 플러그인
+				urlTransform={(value: string) => value}
 				components={{
 					code({ className, children, ...props }: CodeProps) {
 						const match = /language-(\w+)/.exec(className || '')
@@ -81,12 +82,16 @@ const RenderMarkdown = ({ markdown }: MarkdownProps) => {
 							</pre>
 						)
 					},
-					img({ alt, src, ...props }) {
+					img({ ...props }) {
 						return (
 							<img
-								src={src}
-								alt={alt}
-								style={{ maxWidth: '50%', justifyContent: 'center' }}
+								style={{
+									maxWidth: '50%',
+									justifyContent: 'center',
+									alignItems: 'center',
+									display: 'flex',
+									margin: '0 auto',
+								}}
 								{...props}
 							/>
 						)

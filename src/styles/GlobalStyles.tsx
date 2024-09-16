@@ -167,6 +167,7 @@ const GlobalStyles = () => (
 				padding: 1em;
 				margin-bottom: 20px;
 			}
+			textarea,
 			#root {
 				width: 100%;
 				height: 100%;
