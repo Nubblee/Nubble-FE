@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useRef, useState } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { ImagePlus, ArrowLeft } from 'lucide-react'
 import styled from '@emotion/styled'
 import colors from '@/constants/color'
@@ -7,6 +7,13 @@ import { fontSize, fontWeight } from '@/constants/font'
 import Button from '@components/Button'
 import RenderMarkdown from '@components/RenderMarkdown'
 import SelectBox from '@components/SelectBox'
+
+interface Post {
+	title: string
+	content: string
+	category: string
+	subCategory: string
+}
 
 const selectData = [
 	{
@@ -20,15 +27,33 @@ const subData = {
 		{ key: 'Algorithm', value: '알고리즘' },
 	],
 }
+const postsData: Record<string, Post> = {
+	1: {
+		title: '나는 1번이다',
+		content: '나는 1번이다 이건 테스트임',
+		category: 'study',
+		subCategory: 'cs',
+	},
+	2: {
+		title: '나는 2번이다',
+		content: '나는 2번이다 이건 아까와 똑같은 테스트임',
+		category: 'study',
+		subCategory: 'cs',
+	},
+}
 
 const WritePage = () => {
 	const navigate = useNavigate()
+	const location = useLocation()
+	const queryParams = new URLSearchParams(location.search)
+	const id = queryParams.get('id')
 	const fileRef = useRef<HTMLInputElement>(null)
 	const readRef = useRef<HTMLDivElement>(null)
 	const [markdownText, setMarkdownText] = useState('')
 	const [title, setTitle] = useState('')
 	const [selectedCategory, setSelectedCategory] = useState<string>('')
 	const [selectedSubCategory, setSelectedSubCategory] = useState<string>('')
+	const [isEditing, setIsEditing] = useState(false)
 
 	const handleUploadFile = () => {
 		if (fileRef.current) {
@@ -76,6 +101,19 @@ const WritePage = () => {
 	const handleSubData = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		setSelectedSubCategory(e.target.value)
 	}
+
+	useEffect(() => {
+		if (id) {
+			setIsEditing(true)
+			const post = postsData[id]
+			if (post) {
+				setTitle(post.title)
+				setMarkdownText(post.content)
+				setSelectedCategory(post.category)
+				setSelectedSubCategory(post.subCategory)
+			}
+		}
+	}, [id])
 
 	return (
 		<Container>
@@ -131,7 +169,11 @@ const WritePage = () => {
 						<Button variant="secondary" radius={50}>
 							임시저장
 						</Button>
-						<Button radius={50}>등록하기</Button>
+						{isEditing ? (
+							<Button radius={50}>수정하기</Button>
+						) : (
+							<Button radius={50}>등록하기</Button>
+						)}
 					</div>
 				</div>
 			</div>
