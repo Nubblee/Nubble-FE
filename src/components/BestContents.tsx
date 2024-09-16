@@ -56,6 +56,7 @@ const Container = styled.div`
 	border-radius: 10px;
 	box-shadow: 0px 5px 5px -3px rgba(255, 255, 255, 0.5);
 	padding: 20px;
+	margin-bottom: 40px;
 
 	.title {
 		color: ${colors.primaryBlue};
