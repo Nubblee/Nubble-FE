@@ -1,18 +1,26 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from '@emotion/styled'
 import colors from '@/constants/color'
 import Logo from '@components/Logo'
 import { fontSize } from '@/constants/font'
 
 const Login: React.FC = () => {
+	const [id, setId] = useState('')
+	const [pw, setPw] = useState('')
+
 	return (
 		<Container>
 			<Logo logoWidth={360} />
 			<span>로그인 정보를 입력해주세요.</span>
 			<form className="form-container" onSubmit={() => {}}>
-				<input type="text" name="userName" placeholder="아이디" />
-				<input type="password" name="password" placeholder="비밀번호" />
-				<button type="submit" className="login-btn">
+				<input value={id} placeholder="아이디" onChange={(e) => setId(e.target.value)} />
+				<input
+					value={pw}
+					type="password"
+					placeholder="비밀번호"
+					onChange={(e) => setPw(e.target.value)}
+				/>
+				<button type="submit" className="login-btn" disabled={!id || !pw}>
 					로그인
 				</button>
 			</form>
@@ -66,6 +74,17 @@ const Container = styled.div`
 		&:hover {
 			background-color: ${colors.hoverBlue};
 			color: ${colors.white};
+		}
+
+		&:disabled {
+			background-color: ${colors.commentBlack};
+			color: ${colors.commentGray};
+			cursor: not-allowed;
+
+			&:hover {
+				background-color: ${colors.commentBlack};
+				color: ${colors.commentGray};
+			}
 		}
 	}
 `
