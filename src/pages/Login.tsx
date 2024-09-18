@@ -3,16 +3,29 @@ import styled from '@emotion/styled'
 import colors from '@/constants/color'
 import Logo from '@components/Logo'
 import { fontSize } from '@/constants/font'
+import { useNavigate } from 'react-router-dom'
 
 const Login: React.FC = () => {
 	const [id, setId] = useState('')
 	const [pw, setPw] = useState('')
+	const navigate = useNavigate()
+
+	const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
+		try {
+			if (id === 'test' && pw === '123456') {
+				navigate('/')
+			}
+		} catch (error) {
+			console.error('로그인 실패', error)
+		}
+	}
 
 	return (
 		<Container>
 			<Logo logoWidth={360} />
 			<span>로그인 정보를 입력해주세요.</span>
-			<form className="form-container" onSubmit={() => {}}>
+			<form className="form-container" onSubmit={handleLogin}>
 				<input value={id} placeholder="아이디" onChange={(e) => setId(e.target.value)} />
 				<input
 					value={pw}
