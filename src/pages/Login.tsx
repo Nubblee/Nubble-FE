@@ -5,38 +5,38 @@ import Logo from '@components/Logo'
 import { fontSize } from '@/constants/font'
 import { useNavigate } from 'react-router-dom'
 
-const userInfo = [
-	{
-		name: '김수민',
-		id: 'ssuminii',
-		pw: '990430',
-	},
-	{
-		name: '박지영',
-		id: 'zxxzero',
-		pw: '051127',
-	},
-	{
-		name: '손성오',
-		id: 'sonseongoh',
-		pw: '950128',
-	},
-	{
-		name: '유원우',
-		id: 'biddan606',
-		pw: '960128',
-	},
-]
-
 const Login: React.FC = () => {
 	const [id, setId] = useState('')
 	const [pw, setPw] = useState('')
 	const navigate = useNavigate()
 
-	const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		const userCheck = userInfo.some((user) => user.id === id && user.pw === pw)
-		return userCheck ? navigate('/') : alert('아이디 또는 비밀번호가 일치하지 않습니다.')
+		await getUser()
+	}
+
+	async function getUser() {
+		const res = await fetch(
+			'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/sessions',
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					username: id,
+					password: pw,
+				}),
+				credentials: 'include',
+			},
+		)
+
+		if (res.ok) {
+			console.log('로그인 성공!!!!!!!!!!!!!!!')
+			navigate('/')
+		} else {
+			alert('아이디랑 비밀번호를 확인해주세요.')
+		}
 	}
 
 	return (
