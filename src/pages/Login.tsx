@@ -2,12 +2,13 @@ import React, { useState } from 'react'
 import styled from '@emotion/styled'
 import colors from '@/constants/color'
 import Logo from '@components/Logo'
-import { fontSize } from '@/constants/font'
+import { fontSize, fontWeight } from '@/constants/font'
 import { useNavigate } from 'react-router-dom'
 
 const Login: React.FC = () => {
 	const [id, setId] = useState('')
 	const [pw, setPw] = useState('')
+	const [error, setError] = useState(false)
 	const navigate = useNavigate()
 
 	const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -35,14 +36,14 @@ const Login: React.FC = () => {
 			console.log('로그인 성공!!!!!!!!!!!!!!!')
 			navigate('/')
 		} else {
-			alert('아이디랑 비밀번호를 확인해주세요.')
+			setError(true)
 		}
 	}
 
 	return (
 		<Container>
 			<Logo logoWidth={360} />
-			<span>로그인 정보를 입력해주세요.</span>
+			<span className="login-desc">로그인 정보를 입력해주세요.</span>
 			<form className="form-container" onSubmit={handleLogin}>
 				<input value={id} placeholder="아이디" onChange={(e) => setId(e.target.value)} />
 				<input
@@ -51,6 +52,9 @@ const Login: React.FC = () => {
 					placeholder="비밀번호"
 					onChange={(e) => setPw(e.target.value)}
 				/>
+				<span className={`error-message ${error ? 'show' : ''}`}>
+					아이디와 비밀번호를 확인해주세요.
+				</span>
 				<button type="submit" className="login-btn" disabled={!id || !pw}>
 					로그인
 				</button>
@@ -86,11 +90,22 @@ const Container = styled.div`
 		font-size: ${fontSize.lg};
 	}
 
-	span {
+	.login-desc {
 		color: ${colors.commentGray};
 		text-align: left;
 		width: 390px;
 		margin: 28px 0 48px 0;
+	}
+
+	.error-message {
+		font-size: ${fontSize.sm};
+		font-weight: ${fontWeight.light};
+		color: #d62323;
+		display: none;
+	}
+
+	.error-message.show {
+		display: block;
 	}
 
 	.login-btn {
