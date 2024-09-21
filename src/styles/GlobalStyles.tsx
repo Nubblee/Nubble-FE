@@ -196,6 +196,7 @@ const GlobalStyles = () => (
 				height: 100%;
 				width: 100%;
 				overflow-y: auto;
+				background-color: ${colors.bgBlack};
 			}
 		`}
 	/>

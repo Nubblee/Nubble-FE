@@ -123,7 +123,7 @@ const Container = styled.div`
 	width: 100%;
 	height: 100%;
 	background-color: ${colors.bgBlack};
-	max-width: 1280px;
+	max-width: 1080px;
 	margin: 20px auto;
 `
 const ContentContainer = styled.div`
@@ -137,8 +137,9 @@ const PostContainer = styled.div`
 	border-right: 1px solid ${colors.white};
 
 	.newest-posts {
-		max-height: 800px;
-		overflow-y: scroll;
+		padding-right: 60px;
+		max-height: 80%;
+		overflow-y: auto;
 	}
 
 	.menu {
