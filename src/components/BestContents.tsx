@@ -50,8 +50,8 @@ const BestContents = () => {
 }
 
 const Container = styled.div`
-	width: 344px;
-	height: 181px;
+	width: 280px;
+	height: 160px;
 	background-color: ${colors.mainGray};
 	border-radius: 10px;
 	box-shadow: 0px 5px 5px -3px rgba(255, 255, 255, 0.5);
@@ -60,7 +60,7 @@ const Container = styled.div`
 
 	.title {
 		color: ${colors.primaryBlue};
-		font-size: ${fontSize.xl};
+		font-size: ${fontSize.lg};
 		font-weight: ${fontWeight.semiBold};
 		margin-bottom: 22px;
 	}
@@ -69,7 +69,7 @@ const Ranking = styled.div`
 	.list-container {
 		display: flex;
 		justify-content: space-between;
-		font-size: ${fontSize.lg};
+		font-size: ${fontSize.sm};
 		font-weight: ${fontWeight.semiBold};
 		margin-bottom: 18px;
 

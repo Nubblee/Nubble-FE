@@ -5,6 +5,7 @@ import Banner from '@components/Banner'
 import colors from '@/constants/color'
 import { fontSize, fontWeight } from '@/constants/font'
 import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '@/stores/authStore'
 
 const postData = [
 	{
@@ -66,6 +67,7 @@ const postData = [
 ]
 
 const Home: React.FC = () => {
+	const { isLogin } = useAuthStore()
 	const navigate = useNavigate()
 	return (
 		<Container>
@@ -77,14 +79,16 @@ const Home: React.FC = () => {
 							<div>코딩테스트</div>
 							<div>스터디</div>
 						</div>
-						<button
-							className="write-btn"
-							onClick={() => {
-								navigate('/write')
-							}}
-						>
-							+ 글쓰기
-						</button>
+						{isLogin && (
+							<button
+								className="write-btn"
+								onClick={() => {
+									navigate('/write')
+								}}
+							>
+								+ 글쓰기
+							</button>
+						)}
 					</div>
 					<div className="category">
 						<div>Lv.0</div>
@@ -123,7 +127,7 @@ const Container = styled.div`
 	width: 100%;
 	height: 100%;
 	background-color: ${colors.bgBlack};
-	max-width: 1280px;
+	max-width: 1080px;
 	margin: 20px auto;
 `
 const ContentContainer = styled.div`
@@ -137,8 +141,9 @@ const PostContainer = styled.div`
 	border-right: 1px solid ${colors.white};
 
 	.newest-posts {
-		max-height: 800px;
-		overflow-y: scroll;
+		padding-right: 60px;
+		max-height: 80%;
+		overflow-y: auto;
 	}
 
 	.menu {
