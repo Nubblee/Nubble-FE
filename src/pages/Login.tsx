@@ -5,19 +5,21 @@ import Logo from '@components/Logo'
 import { fontSize, fontWeight } from '@/constants/font'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { useAuthStore } from '@/stores/authStore'
 
 const Login: React.FC = () => {
 	const [id, setId] = useState('')
 	const [pw, setPw] = useState('')
 	const [error, setError] = useState(false)
 	const navigate = useNavigate()
+	const login = useAuthStore((state) => state.login)
 
 	const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		await getUser()
 	}
 
-	async function getUser() {
+	const getUser = async () => {
 		try {
 			await axios.post(
 				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/sessions',
@@ -32,10 +34,26 @@ const Login: React.FC = () => {
 					withCredentials: true,
 				},
 			)
-			// console.log('로그인 성공!!!!!!!!!!!!!!!')
+			console.log('로그인 성공!!!!!!!!!!!!!!!')
+			login(id)
+			await checkSessionStatus()
 			navigate('/')
 		} catch {
 			setError(true)
+		}
+	}
+
+	const checkSessionStatus = async () => {
+		try {
+			await axios.get(
+				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/sessions/validate',
+				{
+					withCredentials: true,
+				},
+			)
+			console.log('로그인 된 상태')
+		} catch (error) {
+			console.error('로그인 안됨 ㅠㅠ', error)
 		}
 	}
 
