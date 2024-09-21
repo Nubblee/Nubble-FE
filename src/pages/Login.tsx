@@ -35,7 +35,7 @@ const Login: React.FC = () => {
 				},
 			)
 			console.log('로그인 성공!!!!!!!!!!!!!!!')
-			login()
+			login(id)
 			await checkSessionStatus()
 			navigate('/')
 		} catch {

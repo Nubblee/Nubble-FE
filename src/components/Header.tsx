@@ -1,13 +1,13 @@
-import React, { useState } from 'react'
 import styled from '@emotion/styled'
 import Logo from '@components/Logo'
-import { Package, Search } from 'lucide-react'
+import { Package, Search, User } from 'lucide-react'
 import { fontWeight } from '@/constants/font'
 import colors from '@/constants/color'
 import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '@/stores/authStore'
 
 const Header = () => {
-	const [userName, setUserName] = useState<string>('박지영')
+	const { isLogin, userId } = useAuthStore()
 	const navigate = useNavigate()
 
 	return (
@@ -18,16 +18,27 @@ const Header = () => {
 					<Search className="search-icon" strokeWidth={1.5} color={colors.commentGray} size={16} />
 					<input type="text" placeholder="검색" />
 				</SearchForm>
-				<Package
-					strokeWidth={2}
-					className="box-icon"
-					onClick={() => {
-						navigate('/saves')
-					}}
-				/>
-				<div className="user-name">
-					안녕하세요, <span>{userName}</span>님!
-				</div>
+				{isLogin && (
+					<>
+						<Package
+							strokeWidth={2}
+							className="box-icon"
+							onClick={() => {
+								navigate('/saves')
+							}}
+						/>
+						<div className="user-name">
+							안녕하세요, <span>{userId}</span>님!
+						</div>
+					</>
+				)}
+
+				{!isLogin && (
+					<div className="login" onClick={() => navigate('/login')}>
+						<User strokeWidth={2.5} style={{ marginRight: '8px' }} />
+						Login
+					</div>
+				)}
 			</div>
 		</Container>
 	)
@@ -57,6 +68,18 @@ const Container = styled.div`
 		font-weight: ${fontWeight.bold};
 
 		span {
+			margin-left: 2px;
+			color: ${colors.primaryBlue};
+		}
+	}
+
+	.login {
+		display: flex;
+		align-items: center;
+		font-weight: ${fontWeight.semiBold};
+		cursor: pointer;
+
+		&:hover {
 			color: ${colors.primaryBlue};
 		}
 	}
