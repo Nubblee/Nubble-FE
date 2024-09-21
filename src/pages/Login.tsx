@@ -4,6 +4,7 @@ import colors from '@/constants/color'
 import Logo from '@components/Logo'
 import { fontSize, fontWeight } from '@/constants/font'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 const Login: React.FC = () => {
 	const [id, setId] = useState('')
@@ -17,25 +18,23 @@ const Login: React.FC = () => {
 	}
 
 	async function getUser() {
-		const res = await fetch(
-			'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/sessions',
-			{
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
+		try {
+			await axios.post(
+				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/sessions',
+				{
 					username: id,
 					password: pw,
-				}),
-				credentials: 'include',
-			},
-		)
-
-		if (res.ok) {
-			console.log('로그인 성공!!!!!!!!!!!!!!!')
+				},
+				{
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					withCredentials: true,
+				},
+			)
+			// console.log('로그인 성공!!!!!!!!!!!!!!!')
 			navigate('/')
-		} else {
+		} catch {
 			setError(true)
 		}
 	}
