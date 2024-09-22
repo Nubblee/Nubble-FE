@@ -8,6 +8,7 @@ import Saves from '@/pages/Saves'
 import WritePage from '@/pages/WritePage'
 import PreviewPage from '@/pages/PreviewPage'
 import AddQuestion from '@/pages/AddQuestion'
+import TestPage from '@/pages/TestPage'
 
 export const router = createBrowserRouter([
 	{
@@ -39,6 +40,10 @@ export const router = createBrowserRouter([
 			{
 				path: '/AddQuestion',
 				element: <AddQuestion />,
+			},
+			{
+				path: '/test',
+				element: <TestPage />,
 			},
 		],
 	},
