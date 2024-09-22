@@ -9,4 +9,9 @@ export default defineConfig({
 			{ find: '@', replacement: '/src' },
 		],
 	},
+	define: {
+		'process.env': {
+			GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+		},
+	},
 })

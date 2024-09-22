@@ -15,7 +15,7 @@ export default [
 		languageOptions: {
 			ecmaVersion: 2020,
 			parser: tsParser,
-			globals: globals.browser,
+			globals: { ...globals.browser, ...globals.node },
 		},
 		plugins: {
 			'@typescript-eslint': tseslint,
