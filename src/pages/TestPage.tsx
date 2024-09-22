@@ -1,4 +1,5 @@
 import { GetStudyCommit, FileContent } from '@/api/getStudyCommit'
+import { fontSize, fontWeight } from '@/constants/font'
 import styled from '@emotion/styled'
 
 const testAuthor = [
@@ -22,11 +23,18 @@ const TestPage = () => {
 		<Container>
 			{Object.entries(commitData).map(([key, files]) => (
 				<div key={key}>
-					<h3>{key}</h3>
+					<h3>{}</h3>
 					{files.map((file: FileContent) => (
 						<div key={file.name}>
-							<h4>{file.name}</h4>
-							<div className="upload-date">{file.date}</div>
+							<div className="sub-title">{file.name}</div>
+							<div className="upload-info">
+								<div className="sub-date">{file.date}</div>
+								<div className="btn">
+									<div className="delete">삭제</div>
+									<div className="update">수정</div>
+								</div>
+							</div>
+							<div className="sub-author">{key.split('-')[0]}</div>
 							<pre>{file.content}</pre>
 						</div>
 					))}
@@ -44,4 +52,25 @@ const Container = styled.div`
 	max-width: 1080px;
 	height: 100%;
 	background-color: black;
+	line-height: 25px;
+
+	.sub-title {
+		font-size: ${fontSize.xxxxl};
+		font-weight: ${fontWeight.bold};
+	}
+	.upload-info {
+		display: flex;
+		justify-content: space-between;
+		margin: 10px 0;
+
+		.btn {
+			display: flex;
+			gap: 10px;
+		}
+	}
+
+	.sub-author {
+		font-size: ${fontSize.lg};
+		font-weight: ${fontWeight.semiBold};
+	}
 `

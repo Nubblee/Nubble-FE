@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
+import axios from 'axios'
 
 interface User {
 	name: string
@@ -35,10 +36,9 @@ const normalizeString = (str: string) => {
 const getFileCommitInfo = async (username: string, filePath: string) => {
 	const url = `https://api.github.com/repos/${username}/Algorithm/commits?path=${filePath}`
 	try {
-		const res = await fetch(url, { headers })
-		if (!res.ok) throw new Error('not commit')
+		const res = await axios.get(url, { headers })
+		const commitData = await res.data
 
-		const commitData = await res.json()
 		if (commitData.length === 0) return null
 
 		const commitDate = commitData[0].commit.author.date
@@ -53,10 +53,8 @@ const getFileContents = async (username: string, title: string): Promise<FileCon
 	const url = `https://api.github.com/repos/${username}/Algorithm/contents/프로그래머스/${path}`
 
 	try {
-		const res = await fetch(url, { headers })
-		if (!res.ok) throw new Error('failed to fetch github api url')
-
-		const data: GitHubFileInfo[] = await res.json()
+		const res = await axios.get(url, { headers })
+		const data: GitHubFileInfo[] = await res.data
 
 		//LV.n 부분을 제외한 타이틀 이름만 가져옴 (블로그에 등재된 문제 타이틀)
 		const titleWithoutLv = title.replace(/^Lv\.\d+\s*/, '')
@@ -70,21 +68,19 @@ const getFileContents = async (username: string, title: string): Promise<FileCon
 
 		//문제 타이틀 폴더 내 들어있는 파일들 조회
 		const folderUrl = folderMatch.url
-		const folderRes = await fetch(folderUrl, { headers })
-		if (!folderRes.ok) throw new Error('failed to folderRes')
+		const folderRes = await axios.get(folderUrl, { headers })
 
 		//문제 타이틀 폴더 내 문제풀이 js파일 가져오는 로직
-		const folderData: GitHubFileInfo[] = await folderRes.json()
+		const folderData: GitHubFileInfo[] = await folderRes.data
 		const fileMatch = folderData.find((item) => {
 			return `${normalizeString(folderMatch.name)}.js`.includes(normalizeString(item.name))
 		})
 		if (!fileMatch) return []
 
-		const fileRes = await fetch(fileMatch.url, { headers })
-		const fileData = await fileRes.json()
+		const fileRes = await axios.get(fileMatch.url, { headers })
 
 		//js 파일 내 문제풀이 (atob를 통해 base64로 되어있는 문제풀이 디코딩해서 문자열로 변환)
-		const content = atob(fileData.content.replace(/\n/g, ''))
+		const content = atob(fileRes.data.content.replace(/\n/g, ''))
 		const commitDate = await getFileCommitInfo(username, fileMatch.path)
 		const date = formatDate(commitDate)
 
@@ -97,9 +93,8 @@ const getFileContents = async (username: string, title: string): Promise<FileCon
 
 export const GetStudyCommit = (users: User[]) => {
 	const [commitData, setCommitData] = useState<{ [key: string]: FileContent[] }>({})
-	const [title, setTitle] = useState('')
-	const [author, setAuthor] = useState('')
 
+	//더미데이터 추가 (오늘의 문제에 올라간 데이터가 각자의 백준허브 깃에 존재하면 해당하는 문제풀이를 가져오는 로직)
 	const testSubjects = [
 		{
 			id: 1,
@@ -157,10 +152,8 @@ export const GetStudyCommit = (users: User[]) => {
 				users.flatMap((user) =>
 					testSubjects.map((sub) =>
 						getFileContents(user.username, sub.title).then((files) => {
-							setTitle(sub.title)
-							setAuthor(user.name)
 							return {
-								key: `${user.username}-${sub.title}`,
+								key: `${user.name}-${sub.title}`,
 								files,
 							}
 						}),
