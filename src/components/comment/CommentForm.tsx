@@ -25,12 +25,12 @@ const Form = styled.form`
 `
 const InputZone = styled.div`
 	display: flex;
-	gap: 20px;
+	gap: 12px;
 `
 
 const Input = styled.input`
-	padding: 10px;
-	border-radius: 10px;
+	padding: 6px 10px;
+	border-radius: 5px;
 	border: 1px solid ${colors.bgBlack};
 	background-color: ${colors.mainGray};
 	width: 100px;
