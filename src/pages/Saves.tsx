@@ -62,8 +62,10 @@ const Saves = () => {
 
 const Container = styled.div`
 	width: 100%;
-	height: 100vh;
-	padding: 0 400px;
+	height: 100%;
+
+	margin: 20px auto;
+	max-width: 780px;
 
 	.title {
 		font-size: 64px;
@@ -73,7 +75,7 @@ const Container = styled.div`
 `
 
 const SaveContainer = styled.div`
-	width: 824px;
+	width: 100%;
 
 	.save-list {
 		border-bottom: 1px solid ${colors.commentBlack};

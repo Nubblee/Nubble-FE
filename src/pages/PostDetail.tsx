@@ -19,12 +19,15 @@ const PostDetail = () => {
 const Container = styled.div`
 	display: flex;
 	justify-content: center;
+	max-width: 780px;
+	margin: 20px auto;
+	width: 100%;
 `
 
 const Wrapper = styled.div`
 	display: flex;
 	flex-direction: column;
-	width: 50%;
+	width: 100%;
 `
 
 export default PostDetail

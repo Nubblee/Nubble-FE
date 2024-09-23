@@ -53,10 +53,11 @@ const List = styled.div`
 
 const Item = styled.div`
 	padding: 15px;
-	background-color: ${colors.mainGray};
+	background-color: ${colors.bgBlack};
 	border-radius: 5px;
 	border: 1px solid ${colors.bgBlack};
 	color: white;
+	border-bottom: 1px solid ${colors.commentBlack};
 `
 
 const Header = styled.div`
