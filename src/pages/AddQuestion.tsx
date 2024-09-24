@@ -3,14 +3,23 @@ import React, { useState, useEffect } from 'react'
 import colors from '@/constants/color'
 import Button from '@components/Button'
 import { fontSize } from '@/constants/font'
+import { Trash2 } from 'lucide-react' // 삭제 아이콘 사용
+
+// Question 인터페이스를 정의하여 타입을 명시
+interface Question {
+	title: string
+	link: string
+	date: string // date는 문자열로 관리
+}
 
 const AddQuestion = () => {
-	const [formData, setFormData] = useState({
+	const [formData, setFormData] = useState<Question>({
 		title: '',
 		link: '',
 		date: '',
 	})
 
+	const [questions, setQuestions] = useState<Question[]>([]) // 상태에 대한 타입 명시
 	const [isButtonDisabled, setIsButtonDisabled] = useState(true)
 
 	useEffect(() => {
@@ -28,6 +37,19 @@ const AddQuestion = () => {
 			...prevFormData,
 			[name]: value,
 		}))
+	}
+	const handleAddQuestion = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.preventDefault()
+		const { title, link, date } = formData
+		if (title && link && date) {
+			setQuestions([...questions, formData])
+			setFormData({ title: '', link: '', date: '' })
+		}
+	}
+
+	const handleDelete = (index: number) => {
+		const updatedQuestions = questions.filter((_, i) => i !== index) // 선택한 문제 삭제
+		setQuestions(updatedQuestions)
 	}
 
 	return (
@@ -48,13 +70,30 @@ const AddQuestion = () => {
 						value={formData.link}
 						onChange={handleInputChange}
 					/>
-					{isButtonDisabled && <Warning>모든 입력을 채워주세요</Warning>}
+					{isButtonDisabled && <Warning>전부 입력했니? ^^</Warning>}
 				</InputZone>
 				<ButtonWrapper>
-					<SubmitButton disabled={isButtonDisabled}>등록하기</SubmitButton>
+					<SubmitButton disabled={isButtonDisabled} onClick={handleAddQuestion}>
+						등록하기
+					</SubmitButton>
 				</ButtonWrapper>
 			</Form>
-			<QuestionList>{/* 문제 리스트 부분 */}</QuestionList>
+			<QuestionList>
+				<TableHeader>
+					<span>날짜</span>
+					<span>문제 제목</span>
+					<span></span> {/* 삭제 아이콘 자리 */}
+				</TableHeader>
+				{questions.map((question, index) => (
+					<QuestionItem key={index}>
+						<span>{question.date}</span>
+						<span>{question.title}</span>
+						<DeleteIcon onClick={() => handleDelete(index)}>
+							<Trash2 size={20} />
+						</DeleteIcon>
+					</QuestionItem>
+				))}
+			</QuestionList>
 		</Container>
 	)
 }
@@ -123,6 +162,11 @@ const Input = styled.input`
 	color: white;
 `
 
+const Warning = styled.span`
+	color: red;
+	font-size: ${fontSize.xs};
+`
+
 const ButtonWrapper = styled.div`
 	display: flex;
 	justify-content: flex-end;
@@ -136,17 +180,41 @@ const SubmitButton = styled(Button)`
 	font-size: 16px;
 `
 
-const Warning = styled.span`
-	color: red;
-	font-size: ${fontSize.xs};
+const QuestionList = styled.div`
+	width: 100%;
+	margin-top: 20px;
 `
 
-const QuestionList = styled.div`
+const TableHeader = styled.div`
 	display: flex;
-	flex-direction: column;
-	gap: 10px;
-	margin-top: 20px;
-	width: 100%;
+	justify-content: space-between;
+	padding: 10px 0;
+	border-bottom: 1px solid ${colors.commentGray};
+	span {
+		width: 30%;
+		text-align: left;
+		font-size: ${fontSize.md};
+		color: white;
+	}
+`
+
+const QuestionItem = styled.div`
+	display: flex;
+	justify-content: space-between;
+	padding: 20px 0;
+	border-bottom: 1px solid ${colors.commentGray};
+	span {
+		width: 33%;
+		text-align: left;
+		font-size: ${fontSize.md};
+		color: white;
+	}
+`
+
+const DeleteIcon = styled.div`
+	color: red;
+	cursor: pointer;
+	margin-left: 240px;
 `
 
 export default AddQuestion
