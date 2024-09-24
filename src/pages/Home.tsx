@@ -6,6 +6,7 @@ import colors from '@/constants/color'
 import { fontSize, fontWeight } from '@/constants/font'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
+import useCheckSession from '@/hooks/useCheckSession'
 
 const postData = [
 	{
@@ -67,6 +68,7 @@ const postData = [
 ]
 
 const Home: React.FC = () => {
+	useCheckSession()
 	const { isLogin } = useAuthStore()
 	const navigate = useNavigate()
 	return (
