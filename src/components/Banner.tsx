@@ -85,7 +85,7 @@ const BannerWrapper = styled.div`
 	width: 100%;
 	background-color: ${colors.mainGray};
 	border-radius: 10px;
-	padding-top: 40px;
+	padding-top: 30px;
 `
 const BannerTop = styled.div`
 	display: flex;
@@ -118,6 +118,7 @@ const SwiperContainer = styled.div`
 		width: 44px;
 		height: 44px;
 		font-size: 24px;
+		transform: translateY(-30%);
 	}
 
 	.swiper-button-next::after,
@@ -136,7 +137,7 @@ const SwiperContainer = styled.div`
 
 const BannerComponent = styled.div`
 	height: 100px;
-	padding: 20px 80px;
+	padding: 10px 80px;
 `
 
 const BannerDate = styled.div`
