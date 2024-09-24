@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import React, { ButtonHTMLAttributes, ReactNode } from 'react'
-import colors from '../constants/color'
-import { fontSize, fontWeight } from '../constants/font'
+import colors from '@/constants/color'
+import { fontSize, fontWeight } from '@/constants/font'
 import { Link } from 'react-router-dom'
 
 type ButtonVariant = 'primary' | 'secondary'
@@ -41,6 +41,7 @@ const Button = ({
 			radius={radius}
 			disabled={disabled}
 			size={size}
+			{...props}
 		>
 			{children}
 		</ButtonComponent>
@@ -63,6 +64,7 @@ const sizeStyles = {
 		fontSize: `${fontSize.md}`,
 	},
 }
+
 const ButtonComponent = styled.button<ButtonProps>`
 	width: ${({ size = 'md' }) => sizeStyles[size].width};
 	height: ${({ size = 'md' }) => sizeStyles[size].height};
@@ -76,6 +78,8 @@ const ButtonComponent = styled.button<ButtonProps>`
 		variant === 'primary' ? `${colors.primaryBlue}` : 'transparent'};
 	color: ${({ variant }) =>
 		variant === 'primary' ? `${colors.mainGray}` : `${colors.primaryBlue}`};
+	border: ${({ variant }) =>
+		variant === 'secondary' ? `1px solid ${colors.primaryBlue}` : 'none'};
 
 	&:hover {
 		cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
@@ -83,5 +87,11 @@ const ButtonComponent = styled.button<ButtonProps>`
 			variant === 'primary' ? `${colors.hoverBlue}` : `${colors.deleteGray}`};
 		color: ${({ variant }) => variant === 'primary' && `${colors.white}`};
 		transition: 0.2s;
+	}
+
+	&:disabled {
+		cursor: not-allowed;
+		background-color: ${colors.deleteGray};
+		color: ${colors.commentBlack};
 	}
 `
