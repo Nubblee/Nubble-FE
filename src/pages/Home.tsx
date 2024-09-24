@@ -213,7 +213,7 @@ const PostContainer = styled.div`
 			color: ${colors.commentGray};
 			margin-bottom: 20px;
 
-			div:first-child::after {
+			div:first-of-type::after {
 				content: '•';
 				margin: 0 8px;
 			}
