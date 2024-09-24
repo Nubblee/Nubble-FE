@@ -56,9 +56,11 @@ const Title = styled.h1`
 
 const InputZone = styled.div`
 	display: flex;
+	margin: 0 auto;
 	flex-direction: column;
-	align-items: center;
+	align-items: flex-start;
 	width: 100%;
+	max-width: 500px;
 	gap: 14px;
 `
 
