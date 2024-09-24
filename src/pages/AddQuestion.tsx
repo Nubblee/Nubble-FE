@@ -1,20 +1,57 @@
 import styled from '@emotion/styled'
+import React, { useState, useEffect } from 'react'
 import colors from '@/constants/color'
 import Button from '@components/Button'
 import { fontSize } from '@/constants/font'
 
 const AddQuestion = () => {
+	const [formData, setFormData] = useState({
+		title: '',
+		link: '',
+		date: '',
+	})
+
+	const [isButtonDisabled, setIsButtonDisabled] = useState(true)
+
+	useEffect(() => {
+		const { title, link, date } = formData
+		if (title && link && date) {
+			setIsButtonDisabled(false)
+		} else {
+			setIsButtonDisabled(true)
+		}
+	}, [formData])
+
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target
+		setFormData((prevFormData) => ({
+			...prevFormData,
+			[name]: value,
+		}))
+	}
+
 	return (
 		<Container>
 			<Form>
 				<Title>코딩테스트 문제 추가하기</Title>
 				<InputZone>
-					<InputDate type="date" placeholder="날짜 입력" />
-					<Input placeholder="문제 제목을 입력해주세요" />
-					<Input placeholder="문제 링크를 입력해주세요" />
+					<InputDate type="date" name="date" value={formData.date} onChange={handleInputChange} />
+					<Input
+						placeholder="문제 제목을 입력해주세요"
+						name="title"
+						value={formData.title}
+						onChange={handleInputChange}
+					/>
+					<Input
+						placeholder="문제 링크를 입력해주세요"
+						name="link"
+						value={formData.link}
+						onChange={handleInputChange}
+					/>
+					{isButtonDisabled && <Warning>모든 입력을 채워주세요</Warning>}
 				</InputZone>
 				<ButtonWrapper>
-					<SubmitButton>등록하기</SubmitButton>
+					<SubmitButton disabled={isButtonDisabled}>등록하기</SubmitButton>
 				</ButtonWrapper>
 			</Form>
 			<QuestionList>{/* 문제 리스트 부분 */}</QuestionList>
@@ -42,7 +79,7 @@ const Form = styled.form`
 	background-color: ${colors.mainGray};
 	gap: 20px;
 	width: 100%;
-	height: 320px;
+	height: 340px;
 	padding: 10px;
 	border-radius: 8px;
 `
@@ -72,7 +109,7 @@ const InputDate = styled.input`
 	font-size: 16px;
 	border-radius: 4px;
 	background-color: ${colors.commentGray};
-	color: white;
+	color: #707070;
 `
 
 const Input = styled.input`
@@ -82,7 +119,6 @@ const Input = styled.input`
 	padding: 8px;
 	font-size: 16px;
 	border-radius: 4px;
-
 	background-color: ${colors.commentGray};
 	color: white;
 `
@@ -98,6 +134,11 @@ const SubmitButton = styled(Button)`
 	height: 40px;
 	color: white;
 	font-size: 16px;
+`
+
+const Warning = styled.span`
+	color: red;
+	font-size: ${fontSize.xs};
 `
 
 const QuestionList = styled.div`
