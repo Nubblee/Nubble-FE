@@ -7,6 +7,7 @@ import PostDetail from '@/pages/PostDetail'
 import Saves from '@/pages/Saves'
 import WritePage from '@/pages/WritePage'
 import PreviewPage from '@/pages/PreviewPage'
+import AddQuestion from '@/pages/AddQuestion'
 
 export const router = createBrowserRouter([
 	{
@@ -34,6 +35,10 @@ export const router = createBrowserRouter([
 			{
 				path: '/preview',
 				element: <PreviewPage />,
+			},
+			{
+				path: '/AddQuestion',
+				element: <AddQuestion />,
 			},
 		],
 	},
