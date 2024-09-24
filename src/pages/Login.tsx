@@ -21,8 +21,8 @@ const Login: React.FC = () => {
 
 	const getUser = async () => {
 		try {
-			await axios.post(
-				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/sessions',
+			const res = await axios.post(
+				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/auth/sessions',
 				{
 					username: id,
 					password: pw,
@@ -34,26 +34,17 @@ const Login: React.FC = () => {
 					withCredentials: true,
 				},
 			)
+
+			const sessionId = res.data.sessionId
+
+			console.log(res)
+			localStorage.setItem('sessionId', sessionId)
+			localStorage.setItem('userId', id)
 			console.log('로그인 성공!!!!!!!!!!!!!!!')
-			login(id)
-			await checkSessionStatus()
+			login(sessionId, id)
 			navigate('/')
 		} catch {
 			setError(true)
-		}
-	}
-
-	const checkSessionStatus = async () => {
-		try {
-			await axios.get(
-				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/sessions/validate',
-				{
-					withCredentials: true,
-				},
-			)
-			console.log('로그인 된 상태')
-		} catch (error) {
-			console.error('로그인 안됨 ㅠㅠ', error)
 		}
 	}
 
