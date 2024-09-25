@@ -8,6 +8,7 @@ import Saves from '@/pages/Saves'
 import WritePage from '@/pages/WritePage'
 import PreviewPage from '@/pages/PreviewPage'
 import AddQuestion from '@/pages/AddQuestion'
+import LoadingPage from '@/pages/LoadingPage'
 
 export const router = createBrowserRouter([
 	{
@@ -40,6 +41,7 @@ export const router = createBrowserRouter([
 				path: '/AddQuestion',
 				element: <AddQuestion />,
 			},
+			{ path: '/Loading', element: <LoadingPage /> },
 		],
 	},
 ])
