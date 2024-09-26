@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 
 const Header = () => {
-	const { isLogin, userId } = useAuthStore()
+	const { isLogin, userName } = useAuthStore()
 	const navigate = useNavigate()
 
 	return (
@@ -28,7 +28,7 @@ const Header = () => {
 							}}
 						/>
 						<div className="user-name">
-							안녕하세요, <span>{userId}</span>님!
+							안녕하세요, <span>{userName}</span>님!
 						</div>
 					</>
 				)}

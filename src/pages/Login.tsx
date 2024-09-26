@@ -12,7 +12,6 @@ const Login: React.FC = () => {
 	const [pw, setPw] = useState('')
 	const [error, setError] = useState(false)
 	const navigate = useNavigate()
-	const login = useAuthStore((state) => state.login)
 
 	const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
@@ -31,17 +30,10 @@ const Login: React.FC = () => {
 					headers: {
 						'Content-Type': 'application/json',
 					},
-					withCredentials: true,
 				},
 			)
-
-			const sessionId = res.data.sessionId
-
-			console.log(res)
-			localStorage.setItem('sessionId', sessionId)
-			localStorage.setItem('userId', id)
-			console.log('로그인 성공!!!!!!!!!!!!!!!')
-			login(sessionId, id)
+			console.log('로그인 성공', res)
+			localStorage.setItem('sessionId', res.data.sessionId)
 			navigate('/')
 		} catch {
 			setError(true)
