@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from '@emotion/styled'
 import BestContents from '@components/BestContents'
 import Banner from '@components/Banner'
@@ -7,6 +7,7 @@ import { fontSize, fontWeight } from '@/constants/font'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 import useCheckSession from '@/hooks/useCheckSession'
+import axios from 'axios'
 
 const postData = [
 	{
@@ -71,6 +72,34 @@ const Home: React.FC = () => {
 	useCheckSession()
 	const { isLogin } = useAuthStore()
 	const navigate = useNavigate()
+	const login = useAuthStore((state) => state.login)
+
+	useEffect(() => {
+		const getUserInfo = async () => {
+			const sessionId = localStorage.getItem('sessionId')
+
+			if (!sessionId) {
+				console.error('session Id ❌')
+				return
+			}
+
+			const res = await axios.get(
+				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/users/me',
+				{
+					headers: {
+						'Content-Type': 'application/json',
+						'SESSION-ID': sessionId,
+					},
+				},
+			)
+			console.log(res)
+			localStorage.setItem('userName', res.data.nickname)
+			localStorage.setItem('userId', res.data.username)
+			login(sessionId, res.data.username, res.data.nickname)
+		}
+		getUserInfo()
+	}, [login])
+
 	return (
 		<Container>
 			<Banner />
