@@ -37,10 +37,9 @@ const Login: React.FC = () => {
 
 			const sessionId = res.data.sessionId
 
-			console.log(res)
+			console.log('로그인 성공', res)
 			localStorage.setItem('sessionId', sessionId)
 			localStorage.setItem('userId', id)
-			console.log('로그인 성공!!!!!!!!!!!!!!!')
 			login(sessionId, id)
 			navigate('/')
 		} catch {
