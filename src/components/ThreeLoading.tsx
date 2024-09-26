@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import { GLTFLoader, GLTF } from 'three/examples/jsm/loaders/GLTFLoader'
 import styled from '@emotion/styled'
 
-const ThreeLoading = () => {
+const ThreeDModel = () => {
 	const mountRef = useRef<HTMLDivElement | null>(null)
 
 	useEffect(() => {
@@ -15,41 +16,43 @@ const ThreeLoading = () => {
 		)
 		const renderer = new THREE.WebGLRenderer({ antialias: true })
 
-		// 렌더러를 부모 컨테이너의 크기에 맞게 설정
-		renderer.setSize(
-			mountRef.current?.clientWidth || window.innerWidth,
-			mountRef.current?.clientHeight || window.innerHeight,
-		)
-
+		renderer.setSize(window.innerWidth, window.innerHeight)
 		if (mountRef.current) {
 			mountRef.current.appendChild(renderer.domElement)
 		}
 
-		// 큐브 생성
-		const geometry = new THREE.BoxGeometry()
-		const material = new THREE.MeshBasicMaterial({ color: 0xacc1eb, wireframe: true })
-		const cube = new THREE.Mesh(geometry, material)
-		scene.add(cube)
-
 		camera.position.z = 5
 
-		const animate = () => {
-			requestAnimationFrame(animate)
+		// GLTF 모델 로드
+		const loader = new GLTFLoader()
+		loader.setPath('/models/') // 텍스처 경로 설정
+		loader.load(
+			'scene.gltf',
+			(gltf: GLTF) => {
+				// gltf 타입을 명시적으로 지정
+				const model = gltf.scene
+				model.scale.set(2, 2, 2) // 모델 크기 조정
+				scene.add(model)
 
-			cube.rotation.x += 0.01
-			cube.rotation.y += 0.01
+				const animate = () => {
+					requestAnimationFrame(animate)
+					model.rotation.y += 0.01 // 모델 회전
+					renderer.render(scene, camera)
+				}
+				animate()
+			},
+			(xhr) => {
+				console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+			},
+			(error) => {
+				console.error('An error happened', error)
+			},
+		)
 
-			renderer.render(scene, camera)
-		}
-		animate()
-
-		// 창 크기 변경 대응
 		const handleResize = () => {
-			if (mountRef.current) {
-				renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight)
-				camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight
-				camera.updateProjectionMatrix()
-			}
+			renderer.setSize(window.innerWidth, window.innerHeight)
+			camera.aspect = window.innerWidth / window.innerHeight
+			camera.updateProjectionMatrix()
 		}
 		window.addEventListener('resize', handleResize)
 
@@ -61,28 +64,14 @@ const ThreeLoading = () => {
 		}
 	}, [])
 
-	return (
-		<LoadingContainer>
-			<CanvasContainer ref={mountRef} />
-		</LoadingContainer>
-	)
+	return <CanvasContainer ref={mountRef} />
 }
 
-export default ThreeLoading
+export default ThreeDModel
 
 // 스타일 정의
-const LoadingContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	height: 100vh; // 화면 전체 높이를 차지
-	background-color: #333;
-	overflow: hidden;
-`
-
 const CanvasContainer = styled.div`
-	width: 100%;
-	height: 100%; // 부모 컨테이너의 100%를 차지하도록 설정
+	width: 100vw;
+	height: 100vh;
+	background-color: #333;
 `

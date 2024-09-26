@@ -16,7 +16,9 @@
 		"baseUrl": ".",
 		"paths": {
 			"@components/*": ["src/components/*"],
-			"@/*": ["src/*"]
+			"@/*": ["src/*"],
+			"three": ["node_modules/three"],
+			"three/examples/jsm/*": ["node_modules/three/examples/jsm/*"]
 		},
 
 		/* Linting */
