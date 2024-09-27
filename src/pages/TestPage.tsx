@@ -1,8 +1,8 @@
-import { GetStudyCommit, FileContent } from '@/api/getStudyCommit'
+import { GetStudyCommit, type FileContent } from '@/api/getStudyCommit'
 import { fontSize, fontWeight } from '@/constants/font'
 import styled from '@emotion/styled'
 
-const testAuthor = [
+export const testAuthor = [
 	{
 		name: '박지영',
 		username: 'jizerozz',
@@ -21,23 +21,19 @@ const TestPage = () => {
 	const { commitData } = GetStudyCommit(testAuthor)
 	return (
 		<Container>
-			{Object.entries(commitData).map(([key, files]) => (
-				<div key={key}>
-					<h3>{}</h3>
-					{files.map((file: FileContent) => (
-						<div key={file.name}>
-							<div className="sub-title">{file.name}</div>
-							<div className="upload-info">
-								<div className="sub-date">{file.date}</div>
-								<div className="btn">
-									<div className="delete">삭제</div>
-									<div className="update">수정</div>
-								</div>
-							</div>
-							<div className="sub-author">{key.split('-')[0]}</div>
-							<pre>{file.content}</pre>
+			<h3>{}</h3>
+			{commitData.map((file: FileContent) => (
+				<div key={`${file.title}-${file.author}`}>
+					<div className="sub-title">{file.title}</div>
+					<div className="upload-info">
+						<div className="sub-date">{file.date}</div>
+						<div className="btn">
+							<div className="delete">삭제</div>
+							<div className="update">수정</div>
 						</div>
-					))}
+					</div>
+					<div className="sub-author">{file.author}</div>
+					<pre>{file.content}</pre>
 				</div>
 			))}
 		</Container>

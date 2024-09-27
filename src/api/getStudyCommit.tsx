@@ -15,7 +15,8 @@ interface GitHubFileInfo {
 }
 
 export interface FileContent {
-	name: string
+	title: string
+	author?: string
 	content: string
 	date?: string
 }
@@ -54,6 +55,7 @@ const getFileContents = async (username: string, title: string): Promise<FileCon
 
 	try {
 		const res = await axios.get(url, { headers })
+
 		const data: GitHubFileInfo[] = await res.data
 
 		//LV.n 부분을 제외한 타이틀 이름만 가져옴 (블로그에 등재된 문제 타이틀)
@@ -78,13 +80,14 @@ const getFileContents = async (username: string, title: string): Promise<FileCon
 		if (!fileMatch) return []
 
 		const fileRes = await axios.get(fileMatch.url, { headers })
+		const fileData = await fileRes.data
 
 		//js 파일 내 문제풀이 (atob를 통해 base64로 되어있는 문제풀이 디코딩해서 문자열로 변환)
-		const content = atob(fileRes.data.content.replace(/\n/g, ''))
+		const content = atob(fileData.content.replace(/\n/g, ''))
 		const commitDate = await getFileCommitInfo(username, fileMatch.path)
 		const date = formatDate(commitDate)
 
-		return [{ name: fileMatch.name, content, date }]
+		return [{ title: fileMatch.name, content, date }]
 	} catch (error) {
 		console.error(`Error fetching file contents: ${path}`, error)
 		return []
@@ -92,9 +95,8 @@ const getFileContents = async (username: string, title: string): Promise<FileCon
 }
 
 export const GetStudyCommit = (users: User[]) => {
-	const [commitData, setCommitData] = useState<{ [key: string]: FileContent[] }>({})
+	const [commitData, setCommitData] = useState<FileContent[]>([])
 
-	//더미데이터 추가 (오늘의 문제에 올라간 데이터가 각자의 백준허브 깃에 존재하면 해당하는 문제풀이를 가져오는 로직)
 	const testSubjects = [
 		{
 			id: 1,
@@ -152,30 +154,23 @@ export const GetStudyCommit = (users: User[]) => {
 				users.flatMap((user) =>
 					testSubjects.map((sub) =>
 						getFileContents(user.username, sub.title).then((files) => {
-							return {
-								key: `${user.name}-${sub.title}`,
-								files,
-							}
+							return files.map((file) => ({
+								...file,
+								author: user.name,
+								title: sub.title,
+							}))
 						}),
 					),
 				),
 			)
 
-			const newCommitData = allCommits.reduce(
-				(acc: { [key: string]: FileContent[] }, { key, files }) => {
-					if (files.length > 0) {
-						acc[key] = files
-					}
-					return acc
-				},
-				{},
-			)
-			setCommitData(newCommitData)
+			const sortedCommits = allCommits.flat().filter((file) => file)
+			sortedCommits.sort((a, b) => a.title.localeCompare(b.title))
+			setCommitData(sortedCommits)
 		}
 
 		fetchCommits()
 	}, [])
-	console.log(commitData)
 
 	return { commitData }
 }
