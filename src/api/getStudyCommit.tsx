@@ -1,12 +1,6 @@
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import axios from 'axios'
-
-interface User {
-	name: string
-	username: string
-}
-
 interface GitHubFileInfo {
 	name: string
 	type: string
@@ -21,6 +15,22 @@ export interface FileContent {
 	date?: string
 }
 
+//유저 정보 가져오는 api들어오면 됨
+const testAuthor = [
+	{
+		name: '박지영',
+		userId: 'jizerozz',
+	},
+	{
+		name: '김수민',
+		userId: 'ssuminii',
+	},
+	{
+		name: '손성오',
+		userId: 'Sonseongoh',
+	},
+]
+
 const formatDate = (date: Date) => {
 	return dayjs(date).locale('ko').format('YYYY년 MM월 DD일')
 }
@@ -34,8 +44,8 @@ const normalizeString = (str: string) => {
 		.toLowerCase()
 }
 
-const getFileCommitInfo = async (username: string, filePath: string) => {
-	const url = `https://api.github.com/repos/${username}/Algorithm/commits?path=${filePath}`
+const getFileCommitInfo = async (userId: string, filePath: string) => {
+	const url = `https://api.github.com/repos/${userId}/Algorithm/commits?path=${filePath}`
 	try {
 		const res = await axios.get(url, { headers })
 		const commitData = await res.data
@@ -49,9 +59,9 @@ const getFileCommitInfo = async (username: string, filePath: string) => {
 	}
 }
 
-const getFileContents = async (username: string, title: string): Promise<FileContent[]> => {
+const getFileContents = async (userId: string, title: string): Promise<FileContent[]> => {
 	const path = title.slice(3, 4)
-	const url = `https://api.github.com/repos/${username}/Algorithm/contents/프로그래머스/${path}`
+	const url = `https://api.github.com/repos/${userId}/Algorithm/contents/프로그래머스/${path}`
 
 	try {
 		const res = await axios.get(url, { headers })
@@ -84,7 +94,7 @@ const getFileContents = async (username: string, title: string): Promise<FileCon
 
 		//js 파일 내 문제풀이 (atob를 통해 base64로 되어있는 문제풀이 디코딩해서 문자열로 변환)
 		const content = atob(fileData.content.replace(/\n/g, ''))
-		const commitDate = await getFileCommitInfo(username, fileMatch.path)
+		const commitDate = await getFileCommitInfo(userId, fileMatch.path)
 		const date = formatDate(commitDate)
 
 		return [{ title: fileMatch.name, content, date }]
@@ -94,9 +104,10 @@ const getFileContents = async (username: string, title: string): Promise<FileCon
 	}
 }
 
-export const GetStudyCommit = (users: User[]) => {
+export const GetStudyCommit = () => {
 	const [commitData, setCommitData] = useState<FileContent[]>([])
 
+	//등록된 문제 목록 가져오는 api 들어오면됨
 	const testSubjects = [
 		{
 			id: 1,
@@ -148,27 +159,27 @@ export const GetStudyCommit = (users: User[]) => {
 		},
 	]
 
-	useEffect(() => {
-		const fetchCommits = async () => {
-			const allCommits = await Promise.all(
-				users.flatMap((user) =>
-					testSubjects.map((sub) =>
-						getFileContents(user.username, sub.title).then((files) => {
-							return files.map((file) => ({
-								...file,
-								author: user.name,
-								title: sub.title,
-							}))
-						}),
-					),
+	const fetchCommits = async () => {
+		const allCommits = await Promise.all(
+			testAuthor.flatMap((user) =>
+				testSubjects.map((sub) =>
+					getFileContents(user.userId, sub.title).then((files) => {
+						return files.map((file) => ({
+							...file,
+							author: user.name,
+							title: sub.title,
+						}))
+					}),
 				),
-			)
+			),
+		)
 
-			const sortedCommits = allCommits.flat().filter((file) => file)
-			sortedCommits.sort((a, b) => a.title.localeCompare(b.title))
-			setCommitData(sortedCommits)
-		}
+		const sortedCommits = allCommits.flat().filter((file) => file)
+		sortedCommits.sort((a, b) => a.title.localeCompare(b.title))
+		setCommitData(sortedCommits)
+	}
 
+	useEffect(() => {
 		fetchCommits()
 	}, [])
 

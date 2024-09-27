@@ -2,23 +2,8 @@ import { GetStudyCommit, type FileContent } from '@/api/getStudyCommit'
 import { fontSize, fontWeight } from '@/constants/font'
 import styled from '@emotion/styled'
 
-export const testAuthor = [
-	{
-		name: '박지영',
-		username: 'jizerozz',
-	},
-	{
-		name: '김수민',
-		username: 'ssuminii',
-	},
-	{
-		name: '손성오',
-		username: 'Sonseongoh',
-	},
-]
-
 const TestPage = () => {
-	const { commitData } = GetStudyCommit(testAuthor)
+	const { commitData } = GetStudyCommit()
 	return (
 		<Container>
 			<h3>{}</h3>
