@@ -8,14 +8,15 @@ import axios from 'axios'
 import { useAuthStore } from '@/stores/authStore'
 
 interface Question {
-	id?: number // 서버에서 반환하는 문제 ID
-	quizDate: string // 퀴즈 날짜
-	problemTitle: string // 문제 제목
-	problemUrl?: string // 문제 URL (POST 요청 시에만 사용)
+	id: number // problemId 필드로 대체
+	quizDate: string
+	problemTitle: string
+	problemUrl?: string
 }
 
 const AddQuestion = () => {
 	const [formData, setFormData] = useState<Question>({
+		id: 0,
 		quizDate: '',
 		problemTitle: '',
 		problemUrl: '',
@@ -43,7 +44,7 @@ const AddQuestion = () => {
 					'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/coding-problems',
 				)
 				const data = res.data.problems.map((problem: any) => ({
-					id: problem.problemId,
+					id: problem.problemId, // problemId 필드를 id로 저장
 					quizDate: problem.quizDate,
 					problemTitle: problem.problemTitle,
 				}))
@@ -81,7 +82,7 @@ const AddQuestion = () => {
 				])
 
 				// formData 초기화
-				setFormData({ quizDate: '', problemTitle: '', problemUrl: '' })
+				setFormData({ id: 0, quizDate: '', problemTitle: '', problemUrl: '' })
 
 				console.log('문제 추가 성공')
 			} catch (error) {
@@ -114,10 +115,27 @@ const AddQuestion = () => {
 		}
 	}
 
-	// 문제 삭제 핸들러
-	const handleDelete = (index: number) => {
-		const updatedQuestions = questions.filter((_, i) => i !== index) // 선택한 문제 삭제
-		setQuestions(updatedQuestions)
+	// 문제 삭제 핸들러 (DELETE 요청 보내기)
+	const handleDelete = async (id: number) => {
+		try {
+			// DELETE 요청을 서버로 보냄
+			await axios.delete(
+				`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/coding-problems/${id}`,
+				{
+					headers: {
+						'SESSION-ID': sessionId,
+					},
+				},
+			)
+
+			// 성공적으로 삭제되면 클라이언트에서도 상태를 업데이트
+			const updatedQuestions = questions.filter((question) => question.id !== id)
+			setQuestions(updatedQuestions)
+
+			console.log(`문제 ID ${id} 삭제 성공`)
+		} catch (error) {
+			console.error('문제 삭제 중 에러 발생', error)
+		}
 	}
 
 	return (
@@ -157,11 +175,11 @@ const AddQuestion = () => {
 					<span>문제 제목</span>
 					<span></span> {/* 삭제 아이콘 자리 */}
 				</TableHeader>
-				{questions.map((question, index) => (
-					<QuestionItem key={index}>
+				{questions.map((question) => (
+					<QuestionItem key={question.id}>
 						<span>{question.quizDate}</span>
 						<span>{question.problemTitle}</span>
-						<DeleteIcon onClick={() => handleDelete(index)}>
+						<DeleteIcon onClick={() => handleDelete(question.id)}>
 							<Trash2 size={20} />
 						</DeleteIcon>
 					</QuestionItem>
