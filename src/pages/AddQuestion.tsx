@@ -8,16 +8,17 @@ import axios from 'axios'
 import { useAuthStore } from '@/stores/authStore'
 
 interface Question {
-	title: string
-	link: string
-	date: string
+	id?: number // 서버에서 반환하는 문제 ID
+	quizDate: string // 퀴즈 날짜
+	problemTitle: string // 문제 제목
+	problemUrl?: string // 문제 URL (POST 요청 시에만 사용)
 }
 
 const AddQuestion = () => {
 	const [formData, setFormData] = useState<Question>({
-		title: '',
-		link: '',
-		date: '',
+		quizDate: '',
+		problemTitle: '',
+		problemUrl: '',
 	})
 
 	const { sessionId } = useAuthStore()
@@ -26,8 +27,8 @@ const AddQuestion = () => {
 
 	// formData 상태가 변할 때마다 버튼 비활성화 여부를 갱신
 	useEffect(() => {
-		const { title, link, date } = formData
-		if (title && link && date) {
+		const { quizDate, problemTitle, problemUrl } = formData
+		if (quizDate && problemTitle && problemUrl) {
 			setIsButtonDisabled(false)
 		} else {
 			setIsButtonDisabled(true)
@@ -41,9 +42,11 @@ const AddQuestion = () => {
 				const res = await axios.get(
 					'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/coding-problems',
 				)
-				console.log('데이터', res)
-				const data = res.data.problems
-
+				const data = res.data.problems.map((problem: any) => ({
+					id: problem.problemId,
+					quizDate: problem.quizDate,
+					problemTitle: problem.problemTitle,
+				}))
 				setQuestions(data)
 			} catch (error) {
 				console.error(error)
@@ -65,8 +68,8 @@ const AddQuestion = () => {
 	const handleAddQuestion = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault()
 
-		const { title, link, date } = formData
-		if (title && link && date) {
+		const { quizDate, problemTitle, problemUrl } = formData
+		if (quizDate && problemTitle && problemUrl) {
 			try {
 				// 문제 추가 요청을 서버에 보냄
 				const res = await postCodingTest()
@@ -74,11 +77,11 @@ const AddQuestion = () => {
 				// 문제가 성공적으로 추가되면 questions에 추가
 				setQuestions((prevQuestions) => [
 					...prevQuestions,
-					{ quizDate: date, problemTitle: title, problemUrl: link, id: res.data.problemId }, // 새 문제를 추가
+					{ id: res.data.problemId, quizDate, problemTitle, problemUrl }, // 새 문제를 추가
 				])
 
 				// formData 초기화
-				setFormData({ title: '', link: '', date: '' })
+				setFormData({ quizDate: '', problemTitle: '', problemUrl: '' })
 
 				console.log('문제 추가 성공')
 			} catch (error) {
@@ -93,9 +96,9 @@ const AddQuestion = () => {
 			const res = await axios.post(
 				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/coding-problems',
 				{
-					quizDate: formData.date,
-					problemTitle: formData.title,
-					problemUrl: formData.link,
+					quizDate: formData.quizDate,
+					problemTitle: formData.problemTitle,
+					problemUrl: formData.problemUrl,
 				},
 				{
 					headers: {
@@ -122,17 +125,22 @@ const AddQuestion = () => {
 			<Form>
 				<Title>코딩테스트 문제 추가하기</Title>
 				<InputZone>
-					<InputDate type="date" name="date" value={formData.date} onChange={handleInputChange} />
+					<InputDate
+						type="date"
+						name="quizDate"
+						value={formData.quizDate}
+						onChange={handleInputChange}
+					/>
 					<Input
 						placeholder="문제 제목을 입력해주세요"
-						name="title"
-						value={formData.title}
+						name="problemTitle"
+						value={formData.problemTitle}
 						onChange={handleInputChange}
 					/>
 					<Input
 						placeholder="문제 링크를 입력해주세요"
-						name="link"
-						value={formData.link}
+						name="problemUrl"
+						value={formData.problemUrl}
 						onChange={handleInputChange}
 					/>
 					{isButtonDisabled && <Warning>전부 입력했니? ^^</Warning>}
