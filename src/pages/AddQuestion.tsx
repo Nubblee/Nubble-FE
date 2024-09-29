@@ -3,13 +3,14 @@ import React, { useState, useEffect } from 'react'
 import colors from '@/constants/color'
 import Button from '@components/Button'
 import { fontSize } from '@/constants/font'
-import { Trash2 } from 'lucide-react' // 삭제 아이콘 사용
+import { Trash2 } from 'lucide-react'
+import axios from 'axios'
+import { useAuthStore } from '@/stores/authStore'
 
-// Question 인터페이스를 정의하여 타입을 명시
 interface Question {
 	title: string
 	link: string
-	date: string // date는 문자열로 관리
+	date: string
 }
 
 const AddQuestion = () => {
@@ -19,9 +20,11 @@ const AddQuestion = () => {
 		date: '',
 	})
 
-	const [questions, setQuestions] = useState<Question[]>([]) // 상태에 대한 타입 명시
+	const { sessionId } = useAuthStore()
+	const [questions, setQuestions] = useState<Question[]>([])
 	const [isButtonDisabled, setIsButtonDisabled] = useState(true)
 
+	// formData 상태가 변할 때마다 버튼 비활성화 여부를 갱신
 	useEffect(() => {
 		const { title, link, date } = formData
 		if (title && link && date) {
@@ -31,6 +34,25 @@ const AddQuestion = () => {
 		}
 	}, [formData])
 
+	// 서버에서 문제 리스트를 가져오는 useEffect
+	useEffect(() => {
+		const getCodingTestList = async () => {
+			try {
+				const res = await axios.get(
+					'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/coding-problems',
+				)
+				console.log('데이터', res)
+				const data = res.data.problems
+
+				setQuestions(data)
+			} catch (error) {
+				console.error(error)
+			}
+		}
+		getCodingTestList()
+	}, [])
+
+	// 입력 필드 값 변경 핸들러
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
 		setFormData((prevFormData) => ({
@@ -38,15 +60,58 @@ const AddQuestion = () => {
 			[name]: value,
 		}))
 	}
-	const handleAddQuestion = (e: React.MouseEvent<HTMLButtonElement>) => {
+
+	// 문제 추가 버튼 클릭 핸들러
+	const handleAddQuestion = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault()
+
 		const { title, link, date } = formData
 		if (title && link && date) {
-			setQuestions([...questions, formData])
-			setFormData({ title: '', link: '', date: '' })
+			try {
+				// 문제 추가 요청을 서버에 보냄
+				const res = await postCodingTest()
+
+				// 문제가 성공적으로 추가되면 questions에 추가
+				setQuestions((prevQuestions) => [
+					...prevQuestions,
+					{ quizDate: date, problemTitle: title, problemUrl: link, id: res.data.problemId }, // 새 문제를 추가
+				])
+
+				// formData 초기화
+				setFormData({ title: '', link: '', date: '' })
+
+				console.log('문제 추가 성공')
+			} catch (error) {
+				console.error('문제 추가 중 에러 발생', error)
+			}
 		}
 	}
 
+	// 서버로 문제 등록 요청 보내기
+	const postCodingTest = async () => {
+		try {
+			const res = await axios.post(
+				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/coding-problems',
+				{
+					quizDate: formData.date,
+					problemTitle: formData.title,
+					problemUrl: formData.link,
+				},
+				{
+					headers: {
+						'Content-Type': 'application/json',
+						'SESSION-ID': sessionId,
+					},
+				},
+			)
+			return res
+		} catch (error) {
+			console.error(error)
+			throw error
+		}
+	}
+
+	// 문제 삭제 핸들러
 	const handleDelete = (index: number) => {
 		const updatedQuestions = questions.filter((_, i) => i !== index) // 선택한 문제 삭제
 		setQuestions(updatedQuestions)
@@ -86,8 +151,8 @@ const AddQuestion = () => {
 				</TableHeader>
 				{questions.map((question, index) => (
 					<QuestionItem key={index}>
-						<span>{question.date}</span>
-						<span>{question.title}</span>
+						<span>{question.quizDate}</span>
+						<span>{question.problemTitle}</span>
 						<DeleteIcon onClick={() => handleDelete(index)}>
 							<Trash2 size={20} />
 						</DeleteIcon>
@@ -114,7 +179,6 @@ const Form = styled.form`
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-
 	background-color: ${colors.mainGray};
 	gap: 20px;
 	width: 100%;
