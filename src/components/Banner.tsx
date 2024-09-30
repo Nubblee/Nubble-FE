@@ -40,7 +40,8 @@ const Banner = () => {
 	useEffect(() => {
 		const fetchCoteData = async () => {
 			const todayCote = await getCoteData()
-			if (todayCote) {
+			console.log(todayCote)
+			if (todayCote.length > 0) {
 				setCoteData(todayCote)
 			} else {
 				setNoneData('오늘의 문제가 아직 등록되지 않았습니다.')
@@ -80,12 +81,12 @@ const Banner = () => {
 						coteData.map((code) => (
 							<SwiperSlide key={code.problemId}>
 								<BannerComponent>
-									<a href={code.url} target="_blank">
-										<BannerTitle>
+									<BannerTitle>
+										<a href={code.url} target="_blank">
 											{code.problemTitle}
-											<ArrowUpRight size={32} />
-										</BannerTitle>
-									</a>
+											<ArrowUpRight size={33} />
+										</a>
+									</BannerTitle>
 								</BannerComponent>
 							</SwiperSlide>
 						))
