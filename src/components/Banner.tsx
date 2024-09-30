@@ -9,21 +9,15 @@ import { ArrowUpRight } from 'lucide-react'
 import { Plus } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import 'swiper/swiper-bundle.css'
+import axios from 'axios'
+import { useEffect, useState } from 'react'
 
-const CoteData = [
-	{
-		id: 1,
-		date: new Date(),
-		title: 'Lv.0 정수를 나선형으로 배치하기',
-		url: 'https://school.programmers.co.kr/learn/courses/30/lessons/181832',
-	},
-	{
-		id: 2,
-		date: new Date(),
-		title: 'Lv.0 옹알이',
-		url: 'https://school.programmers.co.kr/learn/courses/30/lessons/120956',
-	},
-]
+interface coteDataProps {
+	problemId: number
+	quizDate: string
+	problemTitle: string
+	url: string
+}
 
 const formatDate = (date: Date) => {
 	return dayjs(date).locale('ko').format('YYYY년 MM월 DD일')
@@ -32,12 +26,34 @@ const formatDate = (date: Date) => {
 const Banner = () => {
 	const { isLogin } = useAuthStore()
 	const navigate = useNavigate()
+	const [coteData, setCoteData] = useState<coteDataProps[]>([])
+	const [noneData, setNoneData] = useState('')
+	const todayDate = dayjs(new Date()).format('YYYY-MM-DD')
 
-	const date = formatDate(CoteData[0].date)
+	const getCoteData = async () => {
+		const res = await axios.get(
+			`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/coding-problems?quizDate=${todayDate}`,
+		)
+		return res.data.problems
+	}
+
+	useEffect(() => {
+		const fetchCoteData = async () => {
+			const todayCote = await getCoteData()
+			console.log(todayCote)
+			if (todayCote.length > 0) {
+				setCoteData(todayCote)
+			} else {
+				setNoneData('오늘의 문제가 아직 등록되지 않았습니다.')
+			}
+		}
+		fetchCoteData()
+	}, [])
+
 	return (
 		<BannerWrapper>
 			<BannerTop>
-				<BannerDate>{date} 오늘의 문제</BannerDate>
+				<BannerDate> {formatDate(new Date())} 오늘의 문제</BannerDate>
 				{isLogin && (
 					<BannerBtn
 						onClick={() => {
@@ -61,18 +77,24 @@ const Banner = () => {
 					modules={[Pagination, Navigation]}
 					className="my-swiper"
 				>
-					{CoteData.map((code) => (
-						<SwiperSlide key={code.id}>
-							<BannerComponent>
-								<a href={code.url} target="_blank">
+					{coteData.length > 0 ? (
+						coteData.map((code) => (
+							<SwiperSlide key={code.problemId}>
+								<BannerComponent>
 									<BannerTitle>
-										{code.title}
-										<ArrowUpRight size={32} />
+										<a href={code.url} target="_blank">
+											{code.problemTitle}
+											<ArrowUpRight size={30} viewBox="0 0 20 20" />
+										</a>
 									</BannerTitle>
-								</a>
-							</BannerComponent>
-						</SwiperSlide>
-					))}
+								</BannerComponent>
+							</SwiperSlide>
+						))
+					) : (
+						<BannerComponent>
+							<BannerTitle>{noneData}</BannerTitle>
+						</BannerComponent>
+					)}
 				</Swiper>
 			</SwiperContainer>
 		</BannerWrapper>
