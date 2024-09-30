@@ -84,7 +84,7 @@ const Banner = () => {
 									<BannerTitle>
 										<a href={code.url} target="_blank">
 											{code.problemTitle}
-											<ArrowUpRight size={33} />
+											<ArrowUpRight size={30} viewBox="0 0 20 20" />
 										</a>
 									</BannerTitle>
 								</BannerComponent>
