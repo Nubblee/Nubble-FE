@@ -166,7 +166,7 @@ export const useCoteData = () => {
 
 	useEffect(() => {
 		if (coteDatas.length > 0) {
-			fetchCommits() // 문제 목록을 받아오면 커밋 데이터를 불러옴
+			fetchCommits()
 		}
 	}, [coteDatas])
 

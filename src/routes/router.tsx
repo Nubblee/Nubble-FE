@@ -8,7 +8,6 @@ import Saves from '@/pages/Saves'
 import WritePage from '@/pages/WritePage'
 import PreviewPage from '@/pages/PreviewPage'
 import AddQuestion from '@/pages/AddQuestion'
-import TestPage from '@/pages/TestPage'
 
 export const router = createBrowserRouter([
 	{
@@ -24,7 +23,7 @@ export const router = createBrowserRouter([
 				path: '/login',
 				element: <Login />, // 로그인 페이지 (헤더 없음)
 			},
-			{ path: '/postDetail', element: <PostDetail /> },
+			{ path: '/postDetail/:author/:title', element: <PostDetail /> },
 			{
 				path: '/saves',
 				element: <Saves />,
@@ -40,10 +39,6 @@ export const router = createBrowserRouter([
 			{
 				path: '/AddQuestion',
 				element: <AddQuestion />,
-			},
-			{
-				path: '/test',
-				element: <TestPage />,
 			},
 		],
 	},
