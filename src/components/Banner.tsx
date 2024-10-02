@@ -11,13 +11,7 @@ import { useAuthStore } from '@/stores/authStore'
 import 'swiper/swiper-bundle.css'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
-
-interface coteDataProps {
-	problemId: number
-	quizDate: string
-	problemTitle: string
-	url: string
-}
+import { coteDataProps } from '@/hooks/useCoteData'
 
 const formatDate = (date: Date) => {
 	return dayjs(date).locale('ko').format('YYYY년 MM월 DD일')
@@ -40,7 +34,6 @@ const Banner = () => {
 	useEffect(() => {
 		const fetchCoteData = async () => {
 			const todayCote = await getCoteData()
-			console.log(todayCote)
 			if (todayCote.length > 0) {
 				setCoteData(todayCote)
 			} else {

@@ -4,10 +4,11 @@ import BestContents from '@components/BestContents'
 import Banner from '@components/Banner'
 import colors from '@/constants/color'
 import { fontSize, fontWeight } from '@/constants/font'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 import useCheckSession from '@/hooks/useCheckSession'
 import axios from 'axios'
+import { useCoteData } from '@/hooks/useCoteData'
 
 const postData = [
 	{
@@ -73,6 +74,7 @@ const Home: React.FC = () => {
 	const { isLogin } = useAuthStore()
 	const navigate = useNavigate()
 	const login = useAuthStore((state) => state.login)
+	const { commitData } = useCoteData()
 
 	useEffect(() => {
 		const getUserInfo = async () => {
@@ -129,18 +131,28 @@ const Home: React.FC = () => {
 					</div>
 					<div className="newest-posts">
 						<ul>
-							{postData.map(({ id, image, userName, date, title, content }) => (
-								<li key={id} className="post-list">
-									<img src={image} alt={title} />
-									<div>
-										<div className="post-info">
-											<div className="user-name">{userName}</div>
-											<div className="date">{date}</div>
+							{commitData.map((data) => (
+								<Link
+									to={`/postDetail/${data.author}/${data.title}`}
+									key={`${data.title}-${data.author}`}
+								>
+									<li className="post-list">
+										<img
+											src={
+												'https://i.pinimg.com/564x/db/03/74/db0374bf620649c74c40cddb4c176cd6.jpg'
+											}
+											alt={data.title}
+										/>
+										<div>
+											<div className="post-info">
+												<div className="user-name">{data.author}</div>
+												<div className="date">{data.date}</div>
+											</div>
+											<div className="title">{data.title}</div>
+											<div className="content">{data.content}</div>
 										</div>
-										<div className="title">{title}</div>
-										<div className="content">{content}</div>
-									</div>
-								</li>
+									</li>
+								</Link>
 							))}
 						</ul>
 					</div>
@@ -258,6 +270,11 @@ const PostContainer = styled.div`
 
 		.content {
 			color: ${colors.commentGray};
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 	}
 `
