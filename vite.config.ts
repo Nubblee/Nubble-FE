@@ -11,7 +11,7 @@ export default defineConfig({
 	},
 	define: {
 		'process.env': {
-			GITHUB_TOKEN: process.env.GITHUB_TOKEN,
+			GITHUB_TOKEN: JSON.stringify(process.env.VITE_GITHUB_TOKEN),
 		},
 	},
 })

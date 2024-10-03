@@ -13,6 +13,16 @@ const FloatingMenu = () => {
 		setLikeCount(liked ? likeCount - 1 : likeCount + 1)
 	}
 
+	const handleCopyUrl = async () => {
+		const currentUrl = window.location.href
+		try {
+			await navigator.clipboard.writeText(currentUrl)
+			alert('클립보드에 링크가 복사되었어요.')
+		} catch (err) {
+			console.log(err)
+		}
+	}
+
 	return (
 		<MenuContainer>
 			<IconContainer onClick={handleLikeClick}>
@@ -23,7 +33,7 @@ const FloatingMenu = () => {
 				/>
 				<LikeCount>{likeCount}</LikeCount>
 			</IconContainer>
-			<IconContainer>
+			<IconContainer onClick={handleCopyUrl}>
 				<Share2Icon color={colors.primaryBlue} size={24} />
 			</IconContainer>
 		</MenuContainer>
