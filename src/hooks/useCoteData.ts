@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import dayjs from 'dayjs'
 import axios from 'axios'
 
 interface GitHubFileInfo {
@@ -13,7 +12,7 @@ export interface FileContent {
 	title: string
 	author?: string
 	content: string
-	date?: string
+	date: Date
 	isCote?: boolean
 }
 
@@ -39,10 +38,6 @@ const testAuthor = [
 		userId: 'Sonseongoh',
 	},
 ]
-
-const formatDate = (date: Date) => {
-	return dayjs(date).locale('ko').format('YYYY년 MM월 DD일')
-}
 
 const headers = { Authorization: `${process.env.GITHUB_TOKEN}` }
 //문제 제목 공백 제거, 소문자로 통일시키는 함수
@@ -105,7 +100,7 @@ const getFileContents = async (userId: string, title: string): Promise<FileConte
 		//js 파일 내 문제풀이 (atob를 통해 base64로 되어있는 문제풀이 디코딩해서 문자열로 변환)
 		const content = atob(fileData.content.replace(/\n/g, ''))
 		const commitDate = await getFileCommitInfo(userId, fileMatch.path)
-		const date = formatDate(commitDate)
+		const date = commitDate
 
 		return [{ title: fileMatch.name, content, date }]
 	} catch (error) {
@@ -136,8 +131,8 @@ export const useCoteData = () => {
 	const fetchCommits = async () => {
 		try {
 			const allCommits = await Promise.all(
-				testAuthor.flatMap((user) =>
-					coteDatas.map((sub) =>
+				coteDatas.flatMap((sub) =>
+					testAuthor.map((user) =>
 						getFileContents(user.userId, sub.problemTitle).then((files) => {
 							return files.map((file) => ({
 								...file,
@@ -150,8 +145,12 @@ export const useCoteData = () => {
 				),
 			)
 
-			const sortedCommits = allCommits.flat().filter((file) => file)
-			sortedCommits.sort((a, b) => a.title.localeCompare(b.title))
+			const sortedCommits: FileContent[] = allCommits.flat().filter((file) => file)
+
+			sortedCommits
+				.sort((a, b) => new Date(b.date!).getTime() - new Date(a.date!).getTime())
+				.sort((a, b) => a.title.localeCompare(b.title))
+
 			setCommitData(sortedCommits)
 		} catch (error) {
 			setError('코딩 테스트 문제풀이를 불러오는 중 오류가 발생.')
