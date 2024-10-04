@@ -9,65 +9,7 @@ import { useAuthStore } from '@/stores/authStore'
 import useCheckSession from '@/hooks/useCheckSession'
 import axios from 'axios'
 import { useCoteData } from '@/hooks/useCoteData'
-
-const postData = [
-	{
-		id: 1,
-		image: 'https://i.pinimg.com/564x/db/03/74/db0374bf620649c74c40cddb4c176cd6.jpg',
-		userName: '김수민',
-		date: '2024년 9월 16일',
-		title: 'Migrating to Linear 101',
-		content: 'Linear helps streamline software projects, sprints, task 어쩌구 저쩌구 자를거임',
-	},
-	{
-		id: 2,
-		image: 'https://i.pinimg.com/564x/db/03/74/db0374bf620649c74c40cddb4c176cd6.jpg',
-		userName: '김수민',
-		date: '2024년 9월 16일',
-		title: 'Migrating to Linear 101',
-		content: 'Linear helps streamline software projects, sprints, task 어쩌구 저쩌구 자를거임',
-	},
-	{
-		id: 3,
-		image: 'https://i.pinimg.com/564x/db/03/74/db0374bf620649c74c40cddb4c176cd6.jpg',
-		userName: '김수민',
-		date: '2024년 9월 16일',
-		title: 'Migrating to Linear 101',
-		content: 'Linear helps streamline software projects, sprints, task 어쩌구 저쩌구 자를거임',
-	},
-	{
-		id: 4,
-		image: 'https://i.pinimg.com/564x/db/03/74/db0374bf620649c74c40cddb4c176cd6.jpg',
-		userName: '김수민',
-		date: '2024년 9월 16일',
-		title: 'Migrating to Linear 101',
-		content: 'Linear helps streamline software projects, sprints, task 어쩌구 저쩌구 자를거임',
-	},
-	{
-		id: 5,
-		image: 'https://i.pinimg.com/564x/db/03/74/db0374bf620649c74c40cddb4c176cd6.jpg',
-		userName: '김수민',
-		date: '2024년 9월 16일',
-		title: 'Migrating to Linear 101',
-		content: 'Linear helps streamline software projects, sprints, task 어쩌구 저쩌구 자를거임',
-	},
-	{
-		id: 6,
-		image: 'https://i.pinimg.com/564x/db/03/74/db0374bf620649c74c40cddb4c176cd6.jpg',
-		userName: '김수민',
-		date: '2024년 9월 16일',
-		title: 'Migrating to Linear 101',
-		content: 'Linear helps streamline software projects, sprints, task 어쩌구 저쩌구 자를거임',
-	},
-	{
-		id: 7,
-		image: 'https://i.pinimg.com/564x/db/03/74/db0374bf620649c74c40cddb4c176cd6.jpg',
-		userName: '김수민',
-		date: '2024년 9월 16일',
-		title: 'Migrating to Linear 101',
-		content: 'Linear helps streamline software projects, sprints, task 어쩌구 저쩌구 자를거임',
-	},
-]
+import { formatDate } from '@/utils/formatDate'
 
 const Home: React.FC = () => {
 	useCheckSession()
@@ -146,7 +88,7 @@ const Home: React.FC = () => {
 										<div>
 											<div className="post-info">
 												<div className="user-name">{data.author}</div>
-												<div className="date">{data.date}</div>
+												<div className="date">{formatDate(data.date)}</div>
 											</div>
 											<div className="title">{data.title}</div>
 											<div className="content">{data.content}</div>

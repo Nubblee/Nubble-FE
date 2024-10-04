@@ -5,6 +5,7 @@ import CommentList from '@components/comment/CommentList'
 import FloatingMenu from '@components/FloatingMenu'
 import styled from '@emotion/styled'
 import { type FileContent, useCoteData } from '@/hooks/useCoteData'
+import { formatDate } from '@/utils/formatDate'
 import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 
@@ -32,7 +33,7 @@ const PostDetail = () => {
 							<Title>{data.title}</Title>
 							<MetaData>
 								<DateName>
-									<span>{data.date}</span>
+									<span>{formatDate(data.date)}</span>
 									<span>{data.author}</span>
 								</DateName>
 								<EditDelete>
