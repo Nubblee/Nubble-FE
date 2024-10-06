@@ -95,12 +95,15 @@ const Home: React.FC = () => {
 				<PostContainer>
 					<div className="menu">
 						<div className="menu-list">
-							<div onClick={() => setSelectedTab('cote')} style={{ cursor: 'pointer' }}>
+							<MenuItem isSelected={selectedTab === 'cote'} onClick={() => setSelectedTab('cote')}>
 								코딩테스트
-							</div>
-							<div onClick={() => setSelectedTab('study')} style={{ cursor: 'pointer' }}>
+							</MenuItem>
+							<MenuItem
+								isSelected={selectedTab === 'study'}
+								onClick={() => setSelectedTab('study')}
+							>
 								스터디
-							</div>
+							</MenuItem>
 						</div>
 						{isLogin && (
 							<button
@@ -174,6 +177,17 @@ const Home: React.FC = () => {
 	)
 }
 
+const MenuItem = styled.div<{ isSelected: boolean }>`
+	margin-right: 20px;
+	cursor: pointer;
+	color: ${({ isSelected }) => (isSelected ? colors.white : colors.commentGray)};
+	font-weight: ${({ isSelected }) => (isSelected ? fontWeight.bold : fontWeight.regular)};
+	&:hover {
+		color: ${colors.white};
+		font-weight: ${fontWeight.bold};
+	}
+`
+
 const Container = styled.div`
 	width: 100%;
 	height: 100%;
@@ -181,10 +195,12 @@ const Container = styled.div`
 	max-width: 1080px;
 	margin: 20px auto;
 `
+
 const ContentContainer = styled.div`
 	display: flex;
 	margin-top: 50px;
 `
+
 const PostContainer = styled.div`
 	flex-grow: 1;
 	margin-right: 40px;
@@ -193,6 +209,7 @@ const PostContainer = styled.div`
 
 	.cote-posts {
 		.title-container {
+			width: 650px;
 			display: flex;
 			justify-content: space-between;
 
@@ -226,16 +243,6 @@ const PostContainer = styled.div`
 
 		.menu-list {
 			display: flex;
-
-			div {
-				margin-right: 20px;
-				cursor: pointer;
-
-				&:hover {
-					color: ${colors.white};
-					font-weight: ${fontWeight.bold};
-				}
-			}
 		}
 
 		.write-btn {
