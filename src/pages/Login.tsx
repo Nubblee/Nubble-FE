@@ -5,7 +5,6 @@ import Logo from '@components/Logo'
 import { fontSize, fontWeight } from '@/constants/font'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import { useAuthStore } from '@/stores/authStore'
 
 const Login: React.FC = () => {
 	const [id, setId] = useState('')

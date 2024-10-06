@@ -6,6 +6,7 @@ interface AuthState {
 	userId: string | null
 	userName: string | null
 	login: (sessionId: string, userId: string, userName: string) => void
+	logout: () => void
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -15,5 +16,11 @@ export const useAuthStore = create<AuthState>((set) => ({
 	userName: localStorage.getItem('userName'),
 	login: (sessionId: string, userId: string, userName: string) => {
 		set({ isLogin: true, sessionId, userId, userName })
+	},
+	logout: () => {
+		localStorage.removeItem('sessionId')
+		localStorage.removeItem('userId')
+		localStorage.removeItem('userName')
+		set({ isLogin: false, sessionId: null, userId: null, userName: null })
 	},
 }))
