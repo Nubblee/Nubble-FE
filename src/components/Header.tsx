@@ -1,14 +1,18 @@
 import styled from '@emotion/styled'
 import Logo from '@components/Logo'
-import { Package, Search, User } from 'lucide-react'
+import { Package, Search, User, LogOut } from 'lucide-react'
 import { fontWeight } from '@/constants/font'
 import colors from '@/constants/color'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 
 const Header = () => {
-	const { isLogin, userName } = useAuthStore()
+	const { isLogin, userName, logout } = useAuthStore()
 	const navigate = useNavigate()
+	const handleLogout = () => {
+		logout()
+		navigate('/')
+	}
 
 	return (
 		<Container>
@@ -18,7 +22,7 @@ const Header = () => {
 					<Search className="search-icon" strokeWidth={1.5} color={colors.commentGray} size={16} />
 					<input type="text" placeholder="검색" />
 				</SearchForm>
-				{isLogin && (
+				{isLogin ? (
 					<>
 						<Package
 							strokeWidth={2}
@@ -27,13 +31,12 @@ const Header = () => {
 								navigate('/saves')
 							}}
 						/>
+						<LogOut strokeWidth={2} className="logout-icon" onClick={handleLogout} />
 						<div className="user-name">
 							안녕하세요, <span>{userName}</span>님!
 						</div>
 					</>
-				)}
-
-				{!isLogin && (
+				) : (
 					<div className="login" onClick={() => navigate('/login')}>
 						<User strokeWidth={2.5} style={{ marginRight: '8px' }} />
 						Login
@@ -58,8 +61,11 @@ const Container = styled.div`
 	}
 
 	.box-icon {
-		width: 24px;
-		height: 24px;
+		cursor: pointer;
+		margin-right: 8px;
+	}
+
+	.logout-icon {
 		cursor: pointer;
 	}
 
