@@ -50,7 +50,7 @@ const WritePage = () => {
 	const id = queryParams.get('id')
 	const fileRef = useRef<HTMLInputElement>(null)
 	const readRef = useRef<HTMLDivElement>(null)
-	const [markdownText, setMarkdownText] = useState('')
+	const [markdownContent, setMarkdownContent] = useState('')
 	const [title, setTitle] = useState('')
 	const [selectedCategory, setSelectedCategory] = useState<string>('')
 	const [selectedSubCategory, setSelectedSubCategory] = useState<string>('')
@@ -96,7 +96,6 @@ const WritePage = () => {
 			const newImages: string[] = []
 
 			for (const file of files) {
-				// 파일 업로드
 				try {
 					const res = await uploadFile(file)
 					newImages.push(`![](${res.baseUrl + res.fileName})`)
@@ -104,20 +103,29 @@ const WritePage = () => {
 					console.error('파일 업로드 중 오류 발생:', error)
 				}
 			}
-			setMarkdownText((prev) => prev + newImages.join('\n'))
+			setMarkdownContent((prev) => prev + newImages.join('\n'))
 		}
 	}
 
-	const handleContent = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		const imageRegex = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp|svg))/gi //복붙한 http 형식의 이미지 링크 렌더링 시킬 수 있도록 추가
-		let content = e.target.value
-		content = content.replace(imageRegex, (url) => {
-			if (!content.includes(`![](${url})`)) {
-				return `![](${url})`
+	const handlePaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+		const items = e.clipboardData.items
+		let newContent = markdownContent
+
+		for (let item of items) {
+			if (item.kind === 'file' && item.type.startsWith('image/')) {
+				const file = item.getAsFile()
+				if (file) {
+					const res = await uploadFile(file)
+					newContent += `![](${res.baseUrl + res.fileName})`
+					e.preventDefault()
+				}
 			}
-			return url
-		})
-		setMarkdownText(content)
+		}
+		setMarkdownContent(newContent)
+	}
+
+	const handleContent = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		setMarkdownContent(e.target.value)
 
 		if (readRef.current) {
 			readRef.current.scrollTop = readRef.current.scrollHeight
@@ -133,13 +141,21 @@ const WritePage = () => {
 		setSelectedSubCategory(e.target.value)
 	}
 
+	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
+
+		const formData = new FormData()
+		formData.append('title', title)
+		formData.append('content', markdownContent)
+	}
+
 	useEffect(() => {
 		if (id) {
 			setIsEditing(true)
 			const post = postsData[id]
 			if (post) {
 				setTitle(post.title)
-				setMarkdownText(post.content)
+				setMarkdownContent(post.content)
 				setSelectedCategory(post.category)
 				setSelectedSubCategory(post.subCategory)
 			}
@@ -148,7 +164,7 @@ const WritePage = () => {
 
 	return (
 		<Container>
-			<div className="area-write">
+			<form className="area-write" onSubmit={handleSubmit}>
 				<input
 					className="write-title"
 					type="text"
@@ -188,8 +204,9 @@ const WritePage = () => {
 				<textarea
 					className="content"
 					placeholder="내용을 입력하세요."
-					value={markdownText}
+					value={markdownContent}
 					onChange={handleContent}
+					onPaste={handlePaste}
 				/>
 				<div className="area-footer">
 					<IconButton onClick={handleBack}>
@@ -203,14 +220,16 @@ const WritePage = () => {
 						{isEditing ? (
 							<Button radius={50}>수정하기</Button>
 						) : (
-							<Button radius={50}>등록하기</Button>
+							<Button radius={50} type="submit">
+								등록하기
+							</Button>
 						)}
 					</div>
 				</div>
-			</div>
+			</form>
 			<div ref={readRef} className="area-read">
 				<div className="title">{title}</div>
-				<RenderMarkdown markdown={markdownText} />
+				<RenderMarkdown markdown={markdownContent} />
 			</div>
 		</Container>
 	)
