@@ -61,6 +61,7 @@ const Home: React.FC = () => {
 	const login = useAuthStore((state) => state.login)
 	const { commitData } = useCoteData()
 	const [selectedTab, setSelectedTab] = useState<'cote' | 'study'>('cote')
+	const [selectedLv, setSelectedLv] = useState<string | null>(null)
 
 	useEffect(() => {
 		const getUserInfo = async () => {
@@ -87,6 +88,11 @@ const Home: React.FC = () => {
 		}
 		getUserInfo()
 	}, [login])
+
+	const filteredCommitData = commitData.filter((data) => {
+		if (!selectedLv) return true
+		return data.title.startsWith(selectedLv)
+	})
 
 	return (
 		<Container>
@@ -119,13 +125,18 @@ const Home: React.FC = () => {
 					{selectedTab === 'cote' && (
 						<div className="cote-posts">
 							<div className="category">
-								<div>Lv.0</div>
-								<div>Lv.1</div>
-								<div>Lv.2</div>
-								<div>Lv.3</div>
+								{['Lv0', 'Lv1', 'Lv2', 'Lv3'].map((level) => (
+									<CategoryItem
+										key={level}
+										isSelected={selectedLv === level}
+										onClick={() => setSelectedLv(level)}
+									>
+										{level}
+									</CategoryItem>
+								))}
 							</div>
 							<ul>
-								{commitData.map((data) => (
+								{filteredCommitData.map((data) => (
 									<Link
 										to={`/postDetail/${data.author}/${data.title}`}
 										key={`${data.title}-${data.author}`}
@@ -177,17 +188,6 @@ const Home: React.FC = () => {
 	)
 }
 
-const MenuItem = styled.div<{ isSelected: boolean }>`
-	margin-right: 20px;
-	cursor: pointer;
-	color: ${({ isSelected }) => (isSelected ? colors.white : colors.commentGray)};
-	font-weight: ${({ isSelected }) => (isSelected ? fontWeight.bold : fontWeight.regular)};
-	&:hover {
-		color: ${colors.white};
-		font-weight: ${fontWeight.bold};
-	}
-`
-
 const Container = styled.div`
 	width: 100%;
 	height: 100%;
@@ -208,8 +208,12 @@ const PostContainer = styled.div`
 	border-right: 1px solid ${colors.white};
 
 	.cote-posts {
+		padding-right: 60px;
+		max-height: 80%;
+		overflow-y: auto;
+
 		.title-container {
-			width: 650px;
+			width: 620px;
 			display: flex;
 			justify-content: space-between;
 
@@ -221,9 +225,12 @@ const PostContainer = styled.div`
 			}
 		}
 
-		padding-right: 60px;
-		max-height: 80%;
-		overflow-y: auto;
+		.content {
+			width: 620px;
+			&:hover {
+				color: ${colors.white};
+			}
+		}
 	}
 
 	.study-posts {
@@ -258,24 +265,13 @@ const PostContainer = styled.div`
 
 	.category {
 		display: flex;
-		margin-bottom: 20px;
-
-		div {
-			margin-right: 14px;
-			font-size: ${fontSize.lg};
-			color: ${colors.commentGray};
-			cursor: pointer;
-
-			&:hover {
-				color: ${colors.white};
-				font-weight: ${fontWeight.bold};
-			}
-		}
+		margin-bottom: 30px;
 	}
 
 	.post-list {
 		display: flex;
-		margin-bottom: 30px;
+		margin-bottom: 40px;
+		cursor: pointer;
 
 		img {
 			width: 154px;
@@ -309,8 +305,43 @@ const PostContainer = styled.div`
 			overflow: hidden;
 			text-overflow: ellipsis;
 		}
+
+		&:hover {
+			.content {
+				color: ${colors.white};
+			}
+			border-radius: 10px;
+			background-color: #383838;
+			padding: 16px;
+		}
 	}
 `
+
+const MenuItem = styled.div<{ isSelected: boolean }>`
+	margin-right: 20px;
+	cursor: pointer;
+	color: ${({ isSelected }) => (isSelected ? colors.white : colors.commentGray)};
+	font-weight: ${({ isSelected }) => (isSelected ? fontWeight.bold : fontWeight.regular)};
+
+	&:hover {
+		color: ${colors.white};
+		font-weight: ${fontWeight.bold};
+	}
+`
+
+const CategoryItem = styled.div<{ isSelected: boolean }>`
+	margin-right: 14px;
+	font-size: ${fontSize.lg};
+	color: ${({ isSelected }) => (isSelected ? colors.white : colors.commentGray)};
+	font-weight: ${({ isSelected }) => (isSelected ? fontWeight.bold : fontWeight.regular)};
+	cursor: pointer;
+
+	&:hover {
+		color: ${colors.white};
+		font-weight: ${fontWeight.bold};
+	}
+`
+
 const BestContentsContainer = styled.div``
 
 export default Home
