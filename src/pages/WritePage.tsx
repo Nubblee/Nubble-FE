@@ -7,6 +7,7 @@ import { fontSize, fontWeight } from '@/constants/font'
 import Button from '@components/Button'
 import RenderMarkdown from '@components/RenderMarkdown'
 import SelectBox from '@components/SelectBox'
+import axios from 'axios'
 
 interface Post {
 	title: string
@@ -66,13 +67,43 @@ const WritePage = () => {
 		navigate(-1)
 	}
 
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const uploadFile = async (file: File) => {
+		try {
+			const formData = new FormData()
+			formData.append('file', file)
+
+			const sessionId = localStorage.getItem('sessionId')
+
+			const res = await axios.post(
+				`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/files`,
+				formData,
+				{
+					headers: {
+						'Content-Type': 'multipart/form-data',
+						'SESSION-ID': sessionId,
+					},
+				},
+			)
+			return res.data
+		} catch (error) {
+			console.error('파일 업로드 실패')
+		}
+	}
+
+	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const files = e.target.files
 		if (files) {
-			const newImages = Array.from(files).map((file) => {
-				const url = URL.createObjectURL(file)
-				return `![](${url})`
-			})
+			const newImages: string[] = []
+
+			for (const file of files) {
+				// 파일 업로드
+				try {
+					const res = await uploadFile(file)
+					newImages.push(`![](${res.baseUrl + res.fileName})`)
+				} catch (error) {
+					console.error('파일 업로드 중 오류 발생:', error)
+				}
+			}
 			setMarkdownText((prev) => prev + newImages.join('\n'))
 		}
 	}
