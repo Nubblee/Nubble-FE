@@ -7,6 +7,9 @@ import { fontSize, fontWeight } from '@/constants/font'
 import Button from '@components/Button'
 import RenderMarkdown from '@components/RenderMarkdown'
 import SelectBox from '@components/SelectBox'
+import axios from 'axios'
+import useCategory from '@/hooks/useCategory'
+import useFileUpload from '@/hooks/useFileUpload'
 
 interface Post {
 	title: string
@@ -49,11 +52,19 @@ const WritePage = () => {
 	const id = queryParams.get('id')
 	const fileRef = useRef<HTMLInputElement>(null)
 	const readRef = useRef<HTMLDivElement>(null)
-	const [markdownText, setMarkdownText] = useState('')
+	const sessionId = localStorage.getItem('sessionId')
+	const [markdownContent, setMarkdownContent] = useState('')
 	const [title, setTitle] = useState('')
-	const [selectedCategory, setSelectedCategory] = useState<string>('')
-	const [selectedSubCategory, setSelectedSubCategory] = useState<string>('')
 	const [isEditing, setIsEditing] = useState(false)
+	const {
+		selectedCategory,
+		selectedSubCategory,
+		setSelectedCategory,
+		setSelectedSubCategory,
+		handleSelectedData,
+		handleSubData,
+	} = useCategory()
+	const { uploadFile } = useFileUpload()
 
 	const handleUploadFile = () => {
 		if (fileRef.current) {
@@ -66,40 +77,74 @@ const WritePage = () => {
 		navigate(-1)
 	}
 
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const files = e.target.files
 		if (files) {
-			const newImages = Array.from(files).map((file) => {
-				const url = URL.createObjectURL(file)
-				return `![](${url})`
-			})
-			setMarkdownText((prev) => prev + newImages.join('\n'))
+			const newImages: string[] = []
+
+			for (const file of files) {
+				try {
+					const res = await uploadFile(file)
+					newImages.push(`![](${res.baseUrl + res.fileName})`)
+				} catch (error) {
+					return
+				}
+			}
+			setMarkdownContent((prev) => prev + newImages.join('\n'))
 		}
 	}
 
-	const handleContent = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		const imageRegex = /(https?:\/\/.*\.(?:png|jpg|jpeg|gif|webp|svg))/gi //복붙한 http 형식의 이미지 링크 렌더링 시킬 수 있도록 추가
-		let content = e.target.value
-		content = content.replace(imageRegex, (url) => {
-			if (!content.includes(`![](${url})`)) {
-				return `![](${url})`
+	const handlePaste = async (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+		const items = e.clipboardData.items
+		let newContent = markdownContent
+
+		for (let item of items) {
+			if (item.kind === 'file' && item.type.startsWith('image/')) {
+				const file = item.getAsFile()
+				if (file) {
+					const res = await uploadFile(file)
+					newContent += `![](${res.baseUrl + res.fileName})`
+					e.preventDefault()
+				}
 			}
-			return url
-		})
-		setMarkdownText(content)
+		}
+		setMarkdownContent(newContent)
+	}
+
+	const handleContent = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		setMarkdownContent(e.target.value)
 
 		if (readRef.current) {
 			readRef.current.scrollTop = readRef.current.scrollHeight
 		}
 	}
 
-	const handleSelectedData = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		setSelectedCategory(e.target.value)
-		setSelectedSubCategory('')
-	}
-
-	const handleSubData = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		setSelectedSubCategory(e.target.value)
+	const handleSubmit = async () => {
+		try {
+			if (title && markdownContent) {
+				const res = await axios.post(
+					`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/posts`,
+					{
+						title,
+						content: markdownContent,
+					},
+					{
+						headers: {
+							'Content-Type': 'application/json',
+							'SESSION-ID': sessionId,
+						},
+					},
+				)
+				setTitle('')
+				setMarkdownContent('')
+				setSelectedCategory('')
+				setSelectedSubCategory('')
+				navigate('/preview')
+				return res.data
+			}
+		} catch (error) {
+			console.log('글 등록 error', error)
+		}
 	}
 
 	useEffect(() => {
@@ -108,7 +153,7 @@ const WritePage = () => {
 			const post = postsData[id]
 			if (post) {
 				setTitle(post.title)
-				setMarkdownText(post.content)
+				setMarkdownContent(post.content)
 				setSelectedCategory(post.category)
 				setSelectedSubCategory(post.subCategory)
 			}
@@ -157,8 +202,9 @@ const WritePage = () => {
 				<textarea
 					className="content"
 					placeholder="내용을 입력하세요."
-					value={markdownText}
+					value={markdownContent}
 					onChange={handleContent}
+					onPaste={handlePaste}
 				/>
 				<div className="area-footer">
 					<IconButton onClick={handleBack}>
@@ -172,14 +218,16 @@ const WritePage = () => {
 						{isEditing ? (
 							<Button radius={50}>수정하기</Button>
 						) : (
-							<Button radius={50}>등록하기</Button>
+							<Button radius={50} onClick={handleSubmit}>
+								등록하기
+							</Button>
 						)}
 					</div>
 				</div>
 			</div>
 			<div ref={readRef} className="area-read">
 				<div className="title">{title}</div>
-				<RenderMarkdown markdown={markdownText} />
+				<RenderMarkdown markdown={markdownContent} />
 			</div>
 		</Container>
 	)
