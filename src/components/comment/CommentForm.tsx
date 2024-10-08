@@ -4,6 +4,8 @@ import styled from '@emotion/styled'
 import React, { useState, useEffect } from 'react'
 import { useAuthStore } from '@/stores/authStore'
 
+const MAX_NICKNAME_LENGTH = 6 // 닉네임 길이 제한
+
 const CommentForm = () => {
 	const { isLogin, userName } = useAuthStore()
 
@@ -14,16 +16,26 @@ const CommentForm = () => {
 		comment: '',
 	})
 	const [isButtonDisabled, setIsButtonDisabled] = useState(true)
+	const [nicknameError, setNicknameError] = useState('') // 경고 문구 상태 관리
 
 	// 모든 입력 필드가 채워졌는지 확인하는 로직
 	useEffect(() => {
 		const { nickname, password, comment } = formData
-		if ((nickname || isLogin) && (isLogin || password) && comment) {
+
+		// 닉네임 길이 체크
+		if (!isLogin && nickname.length > MAX_NICKNAME_LENGTH) {
+			setNicknameError(`닉네임은 ${MAX_NICKNAME_LENGTH}글자까지 입력 가능합니다.`)
+		} else {
+			setNicknameError('')
+		}
+
+		// 버튼 활성화 로직
+		if ((nickname || isLogin) && (isLogin || password) && comment && !nicknameError) {
 			setIsButtonDisabled(false)
 		} else {
 			setIsButtonDisabled(true)
 		}
-	}, [formData, isLogin])
+	}, [formData, isLogin, nicknameError])
 
 	// input과 textarea의 값이 변경될 때 상태를 업데이트
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -57,6 +69,7 @@ const CommentForm = () => {
 					value={formData.nickname}
 					onChange={handleInputChange}
 					disabled={isLogin}
+					hasError={!!nicknameError} // nicknameError가 있을 때만 빨간 테두리 적용
 				/>
 				{!isLogin && (
 					<Input
@@ -68,6 +81,10 @@ const CommentForm = () => {
 					/>
 				)}
 			</InputZone>
+
+			{/* 닉네임 에러 메시지 */}
+			{nicknameError && <ErrorMessage>{nicknameError}</ErrorMessage>}
+
 			<Textarea
 				name="comment"
 				placeholder="댓글을 작성하세요"
@@ -83,6 +100,7 @@ const CommentForm = () => {
 	)
 }
 
+// 스타일링
 const Form = styled.form`
 	display: flex;
 	flex-direction: column;
@@ -94,13 +112,19 @@ const InputZone = styled.div`
 	gap: 12px;
 `
 
-const Input = styled.input`
+const Input = styled.input<{ hasError?: boolean }>`
 	padding: 6px 10px;
 	border-radius: 5px;
-	border: 1px solid ${colors.bgBlack};
+	border: 1px solid ${(props) => (props.hasError ? 'red' : colors.bgBlack)}; // 오류가 있을 때 빨간 테두리
 	background-color: ${colors.mainGray};
 	width: 100px;
 	color: white;
+
+	// 포커스 상태에서도 테두리가 붉게 유지되도록
+	&:focus {
+		outline: none;
+		border-color: ${(props) => (props.hasError ? 'red' : colors.bgBlack)};
+	}
 `
 
 const Textarea = styled.textarea`
@@ -112,9 +136,16 @@ const Textarea = styled.textarea`
 	resize: none;
 	height: 95px;
 `
+
 const ButtonWrapper = styled.div`
 	display: flex;
 	justify-content: flex-end;
+`
+
+const ErrorMessage = styled.div`
+	color: red;
+	font-size: 12px;
+	margin-top: 5px;
 `
 
 export default CommentForm
