@@ -8,6 +8,8 @@ import Button from '@components/Button'
 import RenderMarkdown from '@components/RenderMarkdown'
 import SelectBox from '@components/SelectBox'
 import axios from 'axios'
+import useCategory from '@/hooks/useCategory'
+import useFileUpload from '@/hooks/useFileUpload'
 
 interface Post {
 	title: string
@@ -50,11 +52,19 @@ const WritePage = () => {
 	const id = queryParams.get('id')
 	const fileRef = useRef<HTMLInputElement>(null)
 	const readRef = useRef<HTMLDivElement>(null)
+	const sessionId = localStorage.getItem('sessionId')
 	const [markdownContent, setMarkdownContent] = useState('')
 	const [title, setTitle] = useState('')
-	const [selectedCategory, setSelectedCategory] = useState<string>('')
-	const [selectedSubCategory, setSelectedSubCategory] = useState<string>('')
 	const [isEditing, setIsEditing] = useState(false)
+	const {
+		selectedCategory,
+		selectedSubCategory,
+		setSelectedCategory,
+		setSelectedSubCategory,
+		handleSelectedData,
+		handleSubData,
+	} = useCategory()
+	const { uploadFile } = useFileUpload()
 
 	const handleUploadFile = () => {
 		if (fileRef.current) {
@@ -67,29 +77,6 @@ const WritePage = () => {
 		navigate(-1)
 	}
 
-	const uploadFile = async (file: File) => {
-		try {
-			const formData = new FormData()
-			formData.append('file', file)
-
-			const sessionId = localStorage.getItem('sessionId')
-
-			const res = await axios.post(
-				`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/files`,
-				formData,
-				{
-					headers: {
-						'Content-Type': 'multipart/form-data',
-						'SESSION-ID': sessionId,
-					},
-				},
-			)
-			return res.data
-		} catch (error) {
-			console.error('파일 업로드 실패')
-		}
-	}
-
 	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const files = e.target.files
 		if (files) {
@@ -100,7 +87,7 @@ const WritePage = () => {
 					const res = await uploadFile(file)
 					newImages.push(`![](${res.baseUrl + res.fileName})`)
 				} catch (error) {
-					console.error('파일 업로드 중 오류 발생:', error)
+					return
 				}
 			}
 			setMarkdownContent((prev) => prev + newImages.join('\n'))
@@ -132,21 +119,32 @@ const WritePage = () => {
 		}
 	}
 
-	const handleSelectedData = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		setSelectedCategory(e.target.value)
-		setSelectedSubCategory('')
-	}
-
-	const handleSubData = (e: React.ChangeEvent<HTMLSelectElement>) => {
-		setSelectedSubCategory(e.target.value)
-	}
-
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault()
-
-		const formData = new FormData()
-		formData.append('title', title)
-		formData.append('content', markdownContent)
+	const handleSubmit = async () => {
+		try {
+			if (title && markdownContent) {
+				const res = await axios.post(
+					`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/posts`,
+					{
+						title,
+						content: markdownContent,
+					},
+					{
+						headers: {
+							'Content-Type': 'application/json',
+							'SESSION-ID': sessionId,
+						},
+					},
+				)
+				setTitle('')
+				setMarkdownContent('')
+				setSelectedCategory('')
+				setSelectedSubCategory('')
+				navigate('/preview')
+				return res.data
+			}
+		} catch (error) {
+			console.log('글 등록 error', error)
+		}
 	}
 
 	useEffect(() => {
@@ -164,7 +162,7 @@ const WritePage = () => {
 
 	return (
 		<Container>
-			<form className="area-write" onSubmit={handleSubmit}>
+			<div className="area-write">
 				<input
 					className="write-title"
 					type="text"
@@ -220,13 +218,13 @@ const WritePage = () => {
 						{isEditing ? (
 							<Button radius={50}>수정하기</Button>
 						) : (
-							<Button radius={50} type="submit">
+							<Button radius={50} onClick={handleSubmit}>
 								등록하기
 							</Button>
 						)}
 					</div>
 				</div>
-			</form>
+			</div>
 			<div ref={readRef} className="area-read">
 				<div className="title">{title}</div>
 				<RenderMarkdown markdown={markdownContent} />
