@@ -2,8 +2,11 @@ import colors from '@/constants/color'
 import Button from '@components/Button'
 import styled from '@emotion/styled'
 import React, { useState, useEffect } from 'react'
+import { useAuthStore } from '@/stores/authStore'
 
 const CommentForm = () => {
+	const { isLogin, userName } = useAuthStore()
+
 	// 닉네임, 비밀번호, 댓글 입력값 상태 관리
 	const [formData, setFormData] = useState({
 		nickname: '',
@@ -15,12 +18,12 @@ const CommentForm = () => {
 	// 모든 입력 필드가 채워졌는지 확인하는 로직
 	useEffect(() => {
 		const { nickname, password, comment } = formData
-		if (nickname && password && comment) {
+		if ((nickname || isLogin) && (isLogin || password) && comment) {
 			setIsButtonDisabled(false)
 		} else {
 			setIsButtonDisabled(true)
 		}
-	}, [formData])
+	}, [formData, isLogin])
 
 	// input과 textarea의 값이 변경될 때 상태를 업데이트
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -31,22 +34,39 @@ const CommentForm = () => {
 		}))
 	}
 
+	// 폼이 제출될 때 실행되는 함수
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault()
+
+		// 로그인된 상태일 경우 userName을 nickname으로 설정
+		const submittedData = {
+			...formData,
+			nickname: isLogin ? userName : formData.nickname,
+		}
+
+		// 제출할 데이터를 확인하거나 API로 전송하는 로직 추가
+		console.log(submittedData)
+	}
+
 	return (
-		<Form>
+		<Form onSubmit={handleSubmit}>
 			<InputZone>
 				<Input
 					name="nickname"
-					placeholder="닉네임"
+					placeholder={isLogin ? userName || '' : '닉네임'}
 					value={formData.nickname}
 					onChange={handleInputChange}
+					disabled={isLogin}
 				/>
-				<Input
-					name="password"
-					type="password"
-					placeholder="비밀번호"
-					value={formData.password}
-					onChange={handleInputChange}
-				/>
+				{!isLogin && (
+					<Input
+						name="password"
+						type="password"
+						placeholder="비밀번호"
+						value={formData.password}
+						onChange={handleInputChange}
+					/>
+				)}
 			</InputZone>
 			<Textarea
 				name="comment"
@@ -55,7 +75,9 @@ const CommentForm = () => {
 				onChange={handleInputChange}
 			/>
 			<ButtonWrapper>
-				<Button disabled={isButtonDisabled}>등록하기</Button>
+				<Button type="submit" disabled={isButtonDisabled}>
+					등록하기
+				</Button>
 			</ButtonWrapper>
 		</Form>
 	)
