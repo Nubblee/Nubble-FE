@@ -56,6 +56,7 @@ const WritePage = () => {
 	const [markdownContent, setMarkdownContent] = useState('')
 	const [title, setTitle] = useState('')
 	const [isEditing, setIsEditing] = useState(false)
+
 	const {
 		selectedCategory,
 		selectedSubCategory,
@@ -121,27 +122,25 @@ const WritePage = () => {
 
 	const handleSubmit = async () => {
 		try {
-			if (title && markdownContent) {
-				const res = await axios.post(
-					`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/posts`,
-					{
-						title,
-						content: markdownContent,
+			const res = await axios.post(
+				`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/posts`,
+				{
+					title,
+					content: markdownContent,
+				},
+				{
+					headers: {
+						'Content-Type': 'application/json',
+						'SESSION-ID': sessionId,
 					},
-					{
-						headers: {
-							'Content-Type': 'application/json',
-							'SESSION-ID': sessionId,
-						},
-					},
-				)
-				setTitle('')
-				setMarkdownContent('')
-				setSelectedCategory('')
-				setSelectedSubCategory('')
-				navigate('/preview')
-				return res.data
-			}
+				},
+			)
+			setTitle('')
+			setMarkdownContent('')
+			setSelectedCategory('')
+			setSelectedSubCategory('')
+			navigate('/preview')
+			return res.data
 		} catch (error) {
 			console.log('글 등록 error', error)
 		}
@@ -212,13 +211,13 @@ const WritePage = () => {
 						나가기
 					</IconButton>
 					<div className="area-button">
-						<Button variant="secondary" radius={50}>
+						<Button variant="secondary" radius={50} disabled={!(title && markdownContent)}>
 							임시저장
 						</Button>
 						{isEditing ? (
 							<Button radius={50}>수정하기</Button>
 						) : (
-							<Button radius={50} onClick={handleSubmit}>
+							<Button radius={50} onClick={handleSubmit} disabled={!(title && markdownContent)}>
 								등록하기
 							</Button>
 						)}
@@ -345,6 +344,11 @@ const Container = styled.div`
 		background-color: ${colors.mainGray};
 		left: 0;
 		bottom: 0;
+
+		.area-button {
+			display: flex;
+			gap: 10px;
+		}
 	}
 `
 const IconButton = styled.button`
