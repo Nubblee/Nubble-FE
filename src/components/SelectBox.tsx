@@ -1,5 +1,6 @@
 import { ChangeEvent } from 'react'
 import styled from '@emotion/styled'
+import colors from '@/constants/color'
 
 interface SelectBoxProps {
 	label?: string
@@ -40,10 +41,11 @@ const Label = styled.label`
 `
 
 const Select = styled.select`
-	height: 30px;
+	height: 33px;
 	width: 100%;
 	border-radius: 8px;
-	padding-left: 12px;
+	padding: 0 10px;
+	color: ${colors.commentGray};
 `
 
 const Option = styled.option``
