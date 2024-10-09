@@ -98,7 +98,9 @@ const getFileContents = async (userId: string, title: string): Promise<FileConte
 		const fileData = await fileRes.data
 
 		//js 파일 내 문제풀이 (atob를 통해 base64로 되어있는 문제풀이 디코딩해서 문자열로 변환)
-		const content = atob(fileData.content.replace(/\n/g, ''))
+		const content = new TextDecoder('utf-8').decode(
+			new Uint8Array([...atob(fileData.content.replace(/\n/g, ''))].map((c) => c.charCodeAt(0))),
+		)
 		const commitDate = await getFileCommitInfo(userId, fileMatch.path)
 		const date = commitDate
 
