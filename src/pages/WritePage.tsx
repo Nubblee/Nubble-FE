@@ -7,12 +7,12 @@ import { fontSize, fontWeight } from '@/constants/font'
 import Button from '@components/Button'
 import RenderMarkdown from '@components/RenderMarkdown'
 import SelectBox from '@components/SelectBox'
-import axios from 'axios'
 import useCategory from '@/hooks/useCategory'
 import useFileUpload from '@/hooks/useFileUpload'
+import { useWriteStore } from '@/stores/writeStore'
 
 interface Post {
-	title: string
+	markdownTitle: string
 	content: string
 	category: string
 	subCategory: string
@@ -32,13 +32,13 @@ const subData = {
 }
 const postsData: Record<string, Post> = {
 	1: {
-		title: '나는 1번이다',
+		markdownTitle: '나는 1번이다',
 		content: '나는 1번이다 이건 테스트임',
 		category: 'study',
 		subCategory: 'cs',
 	},
 	2: {
-		title: '나는 2번이다',
+		markdownTitle: '나는 2번이다',
 		content: '나는 2번이다 이건 아까와 똑같은 테스트임',
 		category: 'study',
 		subCategory: 'cs',
@@ -52,11 +52,12 @@ const WritePage = () => {
 	const id = queryParams.get('id')
 	const fileRef = useRef<HTMLInputElement>(null)
 	const readRef = useRef<HTMLDivElement>(null)
-	const sessionId = localStorage.getItem('sessionId')
-	const [markdownContent, setMarkdownContent] = useState('')
-	const [title, setTitle] = useState('')
+	const markdownContent = useWriteStore((state) => state.content)
+	const markdownTitle = useWriteStore((state) => state.title)
+	const setTitle = useWriteStore((state) => state.setTitle)
+	const setContent = useWriteStore((state) => state.setContent)
+	const setThumbnail = useWriteStore((state) => state.setThumbnail)
 	const [isEditing, setIsEditing] = useState(false)
-
 	const {
 		selectedCategory,
 		selectedSubCategory,
@@ -73,11 +74,6 @@ const WritePage = () => {
 		}
 	}
 
-	const handleBack = (e: React.MouseEvent) => {
-		e.preventDefault()
-		navigate(-1)
-	}
-
 	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const files = e.target.files
 		if (files) {
@@ -91,7 +87,8 @@ const WritePage = () => {
 					return
 				}
 			}
-			setMarkdownContent((prev) => prev + newImages.join('\n'))
+			const currentState = useWriteStore.getState().content
+			setContent(currentState + newImages.join('\n'))
 		}
 	}
 
@@ -109,41 +106,30 @@ const WritePage = () => {
 				}
 			}
 		}
-		setMarkdownContent(newContent)
+		setContent(newContent)
 	}
 
 	const handleContent = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		setMarkdownContent(e.target.value)
+		setContent(e.target.value)
 
 		if (readRef.current) {
 			readRef.current.scrollTop = readRef.current.scrollHeight
 		}
 	}
 
-	const handleSubmit = async () => {
-		try {
-			const res = await axios.post(
-				`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/posts`,
-				{
-					title,
-					content: markdownContent,
-				},
-				{
-					headers: {
-						'Content-Type': 'application/json',
-						'SESSION-ID': sessionId,
-					},
-				},
-			)
-			setTitle('')
-			setMarkdownContent('')
-			setSelectedCategory('')
-			setSelectedSubCategory('')
-			navigate('/preview')
-			return res.data
-		} catch (error) {
-			console.log('글 등록 error', error)
-		}
+	const handleSubmit = () => {
+		setTitle(markdownTitle)
+		setContent(markdownContent.slice(0, 150))
+		setThumbnail(markdownContent)
+		navigate('/preview')
+	}
+
+	const handleBack = () => {
+		setTitle('')
+		setContent('')
+		setThumbnail('')
+
+		navigate(-1)
 	}
 
 	useEffect(() => {
@@ -151,8 +137,8 @@ const WritePage = () => {
 			setIsEditing(true)
 			const post = postsData[id]
 			if (post) {
-				setTitle(post.title)
-				setMarkdownContent(post.content)
+				setTitle(post.markdownTitle)
+				setContent(post.content)
 				setSelectedCategory(post.category)
 				setSelectedSubCategory(post.subCategory)
 			}
@@ -163,9 +149,9 @@ const WritePage = () => {
 		<Container>
 			<div className="area-write">
 				<input
-					className="write-title"
+					className="write-markdownTitle"
 					type="text"
-					value={title}
+					value={markdownTitle}
 					onChange={(e) => setTitle(e.target.value)}
 					placeholder="제목을 입력하세요"
 				/>
@@ -211,13 +197,17 @@ const WritePage = () => {
 						나가기
 					</IconButton>
 					<div className="area-button">
-						<Button variant="secondary" radius={50} disabled={!(title && markdownContent)}>
+						<Button variant="secondary" radius={50} disabled={!(markdownTitle && markdownContent)}>
 							임시저장
 						</Button>
 						{isEditing ? (
 							<Button radius={50}>수정하기</Button>
 						) : (
-							<Button radius={50} onClick={handleSubmit} disabled={!(title && markdownContent)}>
+							<Button
+								radius={50}
+								onClick={handleSubmit}
+								disabled={!(markdownTitle && markdownContent)}
+							>
 								등록하기
 							</Button>
 						)}
@@ -225,7 +215,7 @@ const WritePage = () => {
 				</div>
 			</div>
 			<div ref={readRef} className="area-read">
-				<div className="title">{title}</div>
+				<div className="markdownTitle">{markdownTitle}</div>
 				<RenderMarkdown markdown={markdownContent} />
 			</div>
 		</Container>
@@ -244,7 +234,7 @@ const Container = styled.div`
 	}
 
 	.content,
-	.write-title {
+	.write-markdownTitle {
 		color: ${colors.white};
 	}
 
@@ -266,7 +256,7 @@ const Container = styled.div`
 		background-color: ${colors.bgBlack};
 		padding-bottom: 70px;
 
-		.write-title {
+		.write-markdownTitle {
 			width: 100%;
 			font-size: ${fontSize.xxxxxl};
 			font-weight: ${fontWeight.semiBold};
@@ -329,7 +319,7 @@ const Container = styled.div`
 		background-color: ${colors.mainBlack};
 		font-size: ${fontSize.md};
 
-		.title {
+		.markdownTitle {
 			font-size: ${fontSize.xxxxxl};
 			font-weight: ${fontWeight.semiBold};
 			margin-bottom: 50px;
