@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-interface previewState {
+interface writeState {
 	title: string
 	thumbnailImg: string
 	content: string
@@ -9,7 +9,7 @@ interface previewState {
 	setContent: (newContent: string) => void
 }
 
-export const usePreviewStore = create<previewState>((set) => ({
+export const useWriteStore = create<writeState>((set) => ({
 	title: '',
 	thumbnailImg: '',
 	content: '',
