@@ -42,8 +42,8 @@ const FloatingMenu = () => {
 
 const MenuContainer = styled.div`
 	position: fixed;
-	left: 239px;
-	top: 331px;
+	left: 18%;
+	top: 26%;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -54,6 +54,22 @@ const MenuContainer = styled.div`
 	border: 1px solid ${colors.primaryBlue};
 	padding: 10px;
 	border-radius: 30px;
+	transition:
+		left 0.3s ease,
+		top 0.3s ease; /* 위치 변경을 부드럽게 만듦 */
+
+	@media (max-width: 1440px) {
+		left: 12%; /* 1440px 이하에서 점진적으로 변경 */
+		top: 26%;
+	}
+
+	@media (max-width: 1280px) {
+		left: 9%; /* 1280px 이하에서 위치 변경 */
+	}
+
+	@media (max-width: 1090px) {
+		display: none; /* 1080px 이하에서는 메뉴를 숨김 */
+	}
 `
 
 const IconContainer = styled.div`

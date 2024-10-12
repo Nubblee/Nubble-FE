@@ -3,6 +3,7 @@ import Button from '@components/Button'
 import styled from '@emotion/styled'
 import React, { useState, useEffect } from 'react'
 import { useAuthStore } from '@/stores/authStore'
+import axios from 'axios'
 
 const MAX_NICKNAME_LENGTH = 6 // 닉네임 길이 제한
 
@@ -17,6 +18,7 @@ const CommentForm = () => {
 	})
 	const [isButtonDisabled, setIsButtonDisabled] = useState(true)
 	const [nicknameError, setNicknameError] = useState('') // 경고 문구 상태 관리
+	const [submitSuccess, setSubmitSuccess] = useState(false) // 제출 성공 여부 상태
 
 	// 모든 입력 필드가 채워졌는지 확인하는 로직
 	useEffect(() => {
@@ -47,7 +49,7 @@ const CommentForm = () => {
 	}
 
 	// 폼이 제출될 때 실행되는 함수
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 
 		// 로그인된 상태일 경우 userName을 nickname으로 설정
@@ -56,8 +58,43 @@ const CommentForm = () => {
 			nickname: isLogin ? userName : formData.nickname,
 		}
 
-		// 제출할 데이터를 확인하거나 API로 전송하는 로직 추가
-		console.log(submittedData)
+		try {
+			if (!isLogin) {
+				const res = await postGuestComment()
+				console.log('비로그인 댓글 제출', res.data)
+			} else {
+				// 로그인된 상태일 때 다른 API 요청 로직 추가 (예: postComment)
+				console.log('Logged-in comment submitted:', submittedData)
+			}
+			setSubmitSuccess(true)
+			setFormData({ nickname: '', password: '', comment: '' })
+		} catch (error) {
+			console.error('Error submitting comment:', error)
+			setSubmitSuccess(false)
+		}
+	}
+
+	//비로그인 댓글작성
+	const postGuestComment = async () => {
+		try {
+			const res = await axios.post(
+				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/posts/{postId}/comments/guest',
+				{
+					content: formData.comment,
+					guestName: formData.nickname,
+					guestPassword: formData.password,
+				},
+				{
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				},
+			)
+			return res
+		} catch (error) {
+			console.error(error)
+			throw error
+		}
 	}
 
 	return (
