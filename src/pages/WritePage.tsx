@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ImagePlus, ArrowLeft } from 'lucide-react'
 import styled from '@emotion/styled'
+import axios from 'axios'
 import colors from '@/constants/color'
 import { fontSize, fontWeight } from '@/constants/font'
 import Button from '@components/Button'
@@ -18,18 +19,6 @@ interface Post {
 	subCategory: string
 }
 
-const selectData = [
-	{
-		key: 'study',
-		value: '스터디',
-	},
-]
-const subData = {
-	study: [
-		{ key: 'cs', value: 'CS' },
-		{ key: 'Algorithm', value: '알고리즘' },
-	],
-}
 const postsData: Record<string, Post> = {
 	1: {
 		markdownTitle: '나는 1번이다',
@@ -54,18 +43,16 @@ const WritePage = () => {
 	const readRef = useRef<HTMLDivElement>(null)
 	const markdownContent = useWriteStore((state) => state.content)
 	const markdownTitle = useWriteStore((state) => state.title)
+	const categories = useWriteStore((state) => state.category)
+	const boards = useWriteStore((state) => state.board)
 	const setTitle = useWriteStore((state) => state.setTitle)
 	const setContent = useWriteStore((state) => state.setContent)
 	const setThumbnail = useWriteStore((state) => state.setThumbnail)
+	const setCategories = useWriteStore((state) => state.setCategory)
+	const setBoards = useWriteStore((state) => state.setBoard)
+
 	const [isEditing, setIsEditing] = useState(false)
-	const {
-		selectedCategory,
-		selectedSubCategory,
-		setSelectedCategory,
-		setSelectedSubCategory,
-		handleSelectedData,
-		handleSubData,
-	} = useCategory()
+	const { selectedCategory, selectedSubCategory, handleSelectedData, handleSubData } = useCategory()
 	const { uploadFile } = useFileUpload()
 
 	const handleUploadFile = () => {
@@ -132,18 +119,52 @@ const WritePage = () => {
 		navigate(-1)
 	}
 
+	const fetchCategory = async () => {
+		const res = await axios.get(
+			`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/categories`,
+			{
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			},
+		)
+		setCategories(res.data.categories)
+	}
+
+	const fetchBoards = async (categoryId: string) => {
+		const res = await axios.get(
+			`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/categories/${categoryId}/boards`,
+			{
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			},
+		)
+		setBoards(res.data.boards)
+	}
+
+	// useEffect(() => {
+	// 	if (id) {
+	// 		setIsEditing(true)
+	// 		const post = postsData[id]
+	// 		if (post) {
+	// 			setTitle(post.markdownTitle)
+	// 			setContent(post.content)
+	// 			setSelectedCategory(post.category)
+	// 			setSelectedSubCategory(post.subCategory)
+	// 		}
+	// 	}
+	// }, [id])
+
 	useEffect(() => {
-		if (id) {
-			setIsEditing(true)
-			const post = postsData[id]
-			if (post) {
-				setTitle(post.markdownTitle)
-				setContent(post.content)
-				setSelectedCategory(post.category)
-				setSelectedSubCategory(post.subCategory)
-			}
+		fetchCategory()
+	}, [])
+
+	useEffect(() => {
+		if (selectedCategory) {
+			fetchBoards(selectedCategory)
 		}
-	}, [id])
+	}, [selectedCategory])
 
 	return (
 		<Container>
@@ -170,13 +191,13 @@ const WritePage = () => {
 					</IconButton>
 					<div className="select-category">
 						<SelectBox
-							options={selectData}
+							options={categories}
 							selectedValue={selectedCategory}
 							placeholder="카테고리 선택"
 							handleChange={handleSelectedData}
 						/>
 						<SelectBox
-							options={selectedCategory ? subData[selectedCategory as keyof typeof subData] : []}
+							options={boards}
 							selectedValue={selectedSubCategory}
 							placeholder="내용 선택"
 							handleChange={handleSubData}
