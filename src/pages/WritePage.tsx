@@ -11,6 +11,7 @@ import SelectBox from '@components/SelectBox'
 import useCategory from '@/hooks/useCategory'
 import useFileUpload from '@/hooks/useFileUpload'
 import { useWriteStore } from '@/stores/writeStore'
+import useWrite from '@/hooks/useWrite'
 
 interface Post {
 	markdownTitle: string
@@ -41,19 +42,20 @@ const WritePage = () => {
 	const id = queryParams.get('id')
 	const fileRef = useRef<HTMLInputElement>(null)
 	const readRef = useRef<HTMLDivElement>(null)
-	const markdownContent = useWriteStore((state) => state.content)
-	const markdownTitle = useWriteStore((state) => state.title)
-	const categories = useWriteStore((state) => state.category)
-	const boards = useWriteStore((state) => state.board)
-	const setTitle = useWriteStore((state) => state.setTitle)
-	const setContent = useWriteStore((state) => state.setContent)
-	const setThumbnail = useWriteStore((state) => state.setThumbnail)
-	const setCategories = useWriteStore((state) => state.setCategory)
-	const setBoards = useWriteStore((state) => state.setBoard)
-
 	const [isEditing, setIsEditing] = useState(false)
 	const { selectedCategory, selectedSubCategory, handleSelectedData, handleSubData } = useCategory()
 	const { uploadFile } = useFileUpload()
+	const [boards, setBoards] = useState([])
+	const {
+		markdownContent,
+		markdownTitle,
+		categories,
+		setTitle,
+		setContent,
+		setThumbnail,
+		setCategories,
+		setBoardId,
+	} = useWrite()
 
 	const handleUploadFile = () => {
 		if (fileRef.current) {
@@ -163,6 +165,7 @@ const WritePage = () => {
 	useEffect(() => {
 		if (selectedCategory) {
 			fetchBoards(selectedCategory)
+			setBoardId(selectedCategory)
 		}
 	}, [selectedCategory])
 
