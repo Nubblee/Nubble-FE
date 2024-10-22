@@ -1,4 +1,4 @@
-import { boardProps, categoryProps } from '@components/SelectBox'
+import { categoryProps } from '@components/SelectBox'
 import { create } from 'zustand'
 
 interface writeState {
@@ -6,12 +6,12 @@ interface writeState {
 	thumbnailImg: string
 	content: string
 	category: categoryProps[]
-	boardId: string
+	boardId: number
 	setTitle: (newTitle: string) => void
 	setThumbnail: (newContent: string) => void
 	setContent: (newContent: string) => void
 	setCategory: (newCategory: categoryProps[]) => void
-	setBoardId: (newBoard: string) => void
+	setBoardId: (newBoard: number) => void
 }
 
 export const useWriteStore = create<writeState>((set) => ({
@@ -19,7 +19,7 @@ export const useWriteStore = create<writeState>((set) => ({
 	thumbnailImg: '',
 	content: '',
 	category: [],
-	boardId: '',
+	boardId: 0,
 	setTitle: (newTitle) => set({ title: newTitle }),
 	setContent: (newContent) => set({ content: newContent }),
 	setThumbnail: (newContent) => {

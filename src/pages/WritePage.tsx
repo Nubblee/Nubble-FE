@@ -12,6 +12,7 @@ import useCategory from '@/hooks/useCategory'
 import useFileUpload from '@/hooks/useFileUpload'
 import { useWriteStore } from '@/stores/writeStore'
 import useWrite from '@/hooks/useWrite'
+import { useAuthStore } from '@/stores/authStore'
 
 interface Post {
 	markdownTitle: string
@@ -50,12 +51,14 @@ const WritePage = () => {
 		markdownContent,
 		markdownTitle,
 		categories,
+		boardId,
 		setTitle,
 		setContent,
 		setThumbnail,
 		setCategories,
 		setBoardId,
 	} = useWrite()
+	const { sessionId } = useAuthStore()
 
 	const handleUploadFile = () => {
 		if (fileRef.current) {
@@ -106,13 +109,6 @@ const WritePage = () => {
 		}
 	}
 
-	const handleSubmit = () => {
-		setTitle(markdownTitle)
-		setContent(markdownContent.slice(0, 150))
-		setThumbnail(markdownContent)
-		navigate('/preview')
-	}
-
 	const handleBack = () => {
 		setTitle('')
 		setContent('')
@@ -145,6 +141,38 @@ const WritePage = () => {
 		setBoards(res.data.boards)
 	}
 
+	const handleSubmit = () => {
+		setTitle(markdownTitle)
+		setContent(markdownContent.slice(0, 150))
+		setThumbnail(markdownContent)
+		navigate('/preview')
+	}
+
+	const handleDraft = async () => {
+		try {
+			const res = await axios.post(
+				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/posts',
+				{
+					title: markdownTitle,
+					content: markdownContent,
+					boardId,
+					status: 'DRAFT',
+					description: markdownContent.slice(0, 10),
+				},
+				{
+					headers: {
+						'Content-Type': 'application/json',
+						'SESSION-ID': sessionId,
+					},
+				},
+			)
+			return res
+		} catch (error) {
+			//임시저장 실패, 성공시 알림 모달 또는 토스트 알림 필요해보임
+			console.log('수정하기 에러', error)
+		}
+	}
+
 	// useEffect(() => {
 	// 	if (id) {
 	// 		setIsEditing(true)
@@ -165,7 +193,7 @@ const WritePage = () => {
 	useEffect(() => {
 		if (selectedCategory) {
 			fetchBoards(selectedCategory)
-			setBoardId(selectedCategory)
+			setBoardId(Number(selectedCategory))
 		}
 	}, [selectedCategory])
 
@@ -221,7 +249,12 @@ const WritePage = () => {
 						나가기
 					</IconButton>
 					<div className="area-button">
-						<Button variant="secondary" radius={50} disabled={!(markdownTitle && markdownContent)}>
+						<Button
+							variant="secondary"
+							radius={50}
+							onClick={handleDraft}
+							disabled={!(markdownTitle && markdownContent)}
+						>
 							임시저장
 						</Button>
 						{isEditing ? (
