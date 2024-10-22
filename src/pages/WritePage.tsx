@@ -2,43 +2,33 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ImagePlus, ArrowLeft } from 'lucide-react'
 import styled from '@emotion/styled'
+import axios from 'axios'
 import colors from '@/constants/color'
 import { fontSize, fontWeight } from '@/constants/font'
 import Button from '@components/Button'
 import RenderMarkdown from '@components/RenderMarkdown'
 import SelectBox from '@components/SelectBox'
-import axios from 'axios'
 import useCategory from '@/hooks/useCategory'
 import useFileUpload from '@/hooks/useFileUpload'
+import { useWriteStore } from '@/stores/writeStore'
+import useWrite from '@/hooks/useWrite'
 
 interface Post {
-	title: string
+	markdownTitle: string
 	content: string
 	category: string
 	subCategory: string
 }
 
-const selectData = [
-	{
-		key: 'study',
-		value: '스터디',
-	},
-]
-const subData = {
-	study: [
-		{ key: 'cs', value: 'CS' },
-		{ key: 'Algorithm', value: '알고리즘' },
-	],
-}
 const postsData: Record<string, Post> = {
 	1: {
-		title: '나는 1번이다',
+		markdownTitle: '나는 1번이다',
 		content: '나는 1번이다 이건 테스트임',
 		category: 'study',
 		subCategory: 'cs',
 	},
 	2: {
-		title: '나는 2번이다',
+		markdownTitle: '나는 2번이다',
 		content: '나는 2번이다 이건 아까와 똑같은 테스트임',
 		category: 'study',
 		subCategory: 'cs',
@@ -52,29 +42,25 @@ const WritePage = () => {
 	const id = queryParams.get('id')
 	const fileRef = useRef<HTMLInputElement>(null)
 	const readRef = useRef<HTMLDivElement>(null)
-	const sessionId = localStorage.getItem('sessionId')
-	const [markdownContent, setMarkdownContent] = useState('')
-	const [title, setTitle] = useState('')
 	const [isEditing, setIsEditing] = useState(false)
-	const {
-		selectedCategory,
-		selectedSubCategory,
-		setSelectedCategory,
-		setSelectedSubCategory,
-		handleSelectedData,
-		handleSubData,
-	} = useCategory()
+	const { selectedCategory, selectedSubCategory, handleSelectedData, handleSubData } = useCategory()
 	const { uploadFile } = useFileUpload()
+	const [boards, setBoards] = useState([])
+	const {
+		markdownContent,
+		markdownTitle,
+		categories,
+		setTitle,
+		setContent,
+		setThumbnail,
+		setCategories,
+		setBoardId,
+	} = useWrite()
 
 	const handleUploadFile = () => {
 		if (fileRef.current) {
 			fileRef.current.click()
 		}
-	}
-
-	const handleBack = (e: React.MouseEvent) => {
-		e.preventDefault()
-		navigate(-1)
 	}
 
 	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,7 +76,8 @@ const WritePage = () => {
 					return
 				}
 			}
-			setMarkdownContent((prev) => prev + newImages.join('\n'))
+			const currentState = useWriteStore.getState().content
+			setContent(currentState + newImages.join('\n'))
 		}
 	}
 
@@ -108,65 +95,87 @@ const WritePage = () => {
 				}
 			}
 		}
-		setMarkdownContent(newContent)
+		setContent(newContent)
 	}
 
 	const handleContent = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		setMarkdownContent(e.target.value)
+		setContent(e.target.value)
 
 		if (readRef.current) {
 			readRef.current.scrollTop = readRef.current.scrollHeight
 		}
 	}
 
-	const handleSubmit = async () => {
-		try {
-			if (title && markdownContent) {
-				const res = await axios.post(
-					`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/posts`,
-					{
-						title,
-						content: markdownContent,
-					},
-					{
-						headers: {
-							'Content-Type': 'application/json',
-							'SESSION-ID': sessionId,
-						},
-					},
-				)
-				setTitle('')
-				setMarkdownContent('')
-				setSelectedCategory('')
-				setSelectedSubCategory('')
-				navigate('/preview')
-				return res.data
-			}
-		} catch (error) {
-			console.log('글 등록 error', error)
-		}
+	const handleSubmit = () => {
+		setTitle(markdownTitle)
+		setContent(markdownContent.slice(0, 150))
+		setThumbnail(markdownContent)
+		navigate('/preview')
 	}
 
+	const handleBack = () => {
+		setTitle('')
+		setContent('')
+		setThumbnail('')
+
+		navigate(-1)
+	}
+
+	const fetchCategory = async () => {
+		const res = await axios.get(
+			`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/categories`,
+			{
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			},
+		)
+		setCategories(res.data.categories)
+	}
+
+	const fetchBoards = async (categoryId: string) => {
+		const res = await axios.get(
+			`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/categories/${categoryId}/boards`,
+			{
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			},
+		)
+		setBoards(res.data.boards)
+	}
+
+	// useEffect(() => {
+	// 	if (id) {
+	// 		setIsEditing(true)
+	// 		const post = postsData[id]
+	// 		if (post) {
+	// 			setTitle(post.markdownTitle)
+	// 			setContent(post.content)
+	// 			setSelectedCategory(post.category)
+	// 			setSelectedSubCategory(post.subCategory)
+	// 		}
+	// 	}
+	// }, [id])
+
 	useEffect(() => {
-		if (id) {
-			setIsEditing(true)
-			const post = postsData[id]
-			if (post) {
-				setTitle(post.title)
-				setMarkdownContent(post.content)
-				setSelectedCategory(post.category)
-				setSelectedSubCategory(post.subCategory)
-			}
+		fetchCategory()
+	}, [])
+
+	useEffect(() => {
+		if (selectedCategory) {
+			fetchBoards(selectedCategory)
+			setBoardId(selectedCategory)
 		}
-	}, [id])
+	}, [selectedCategory])
 
 	return (
 		<Container>
 			<div className="area-write">
 				<input
-					className="write-title"
+					className="write-markdownTitle"
 					type="text"
-					value={title}
+					value={markdownTitle}
 					onChange={(e) => setTitle(e.target.value)}
 					placeholder="제목을 입력하세요"
 				/>
@@ -185,13 +194,13 @@ const WritePage = () => {
 					</IconButton>
 					<div className="select-category">
 						<SelectBox
-							options={selectData}
+							options={categories}
 							selectedValue={selectedCategory}
 							placeholder="카테고리 선택"
 							handleChange={handleSelectedData}
 						/>
 						<SelectBox
-							options={selectedCategory ? subData[selectedCategory as keyof typeof subData] : []}
+							options={boards}
 							selectedValue={selectedSubCategory}
 							placeholder="내용 선택"
 							handleChange={handleSubData}
@@ -212,13 +221,17 @@ const WritePage = () => {
 						나가기
 					</IconButton>
 					<div className="area-button">
-						<Button variant="secondary" radius={50}>
+						<Button variant="secondary" radius={50} disabled={!(markdownTitle && markdownContent)}>
 							임시저장
 						</Button>
 						{isEditing ? (
 							<Button radius={50}>수정하기</Button>
 						) : (
-							<Button radius={50} onClick={handleSubmit}>
+							<Button
+								radius={50}
+								onClick={handleSubmit}
+								disabled={!(markdownTitle && markdownContent)}
+							>
 								등록하기
 							</Button>
 						)}
@@ -226,7 +239,7 @@ const WritePage = () => {
 				</div>
 			</div>
 			<div ref={readRef} className="area-read">
-				<div className="title">{title}</div>
+				<div className="markdownTitle">{markdownTitle}</div>
 				<RenderMarkdown markdown={markdownContent} />
 			</div>
 		</Container>
@@ -245,7 +258,7 @@ const Container = styled.div`
 	}
 
 	.content,
-	.write-title {
+	.write-markdownTitle {
 		color: ${colors.white};
 	}
 
@@ -267,7 +280,7 @@ const Container = styled.div`
 		background-color: ${colors.bgBlack};
 		padding-bottom: 70px;
 
-		.write-title {
+		.write-markdownTitle {
 			width: 100%;
 			font-size: ${fontSize.xxxxxl};
 			font-weight: ${fontWeight.semiBold};
@@ -330,7 +343,7 @@ const Container = styled.div`
 		background-color: ${colors.mainBlack};
 		font-size: ${fontSize.md};
 
-		.title {
+		.markdownTitle {
 			font-size: ${fontSize.xxxxxl};
 			font-weight: ${fontWeight.semiBold};
 			margin-bottom: 50px;
@@ -345,6 +358,11 @@ const Container = styled.div`
 		background-color: ${colors.mainGray};
 		left: 0;
 		bottom: 0;
+
+		.area-button {
+			display: flex;
+			gap: 10px;
+		}
 	}
 `
 const IconButton = styled.button`

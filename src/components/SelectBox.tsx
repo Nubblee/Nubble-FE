@@ -1,9 +1,20 @@
 import { ChangeEvent } from 'react'
 import styled from '@emotion/styled'
+import colors from '@/constants/color'
+
+export interface categoryProps {
+	categoryId: string
+	categoryName: string
+}
+
+export interface boardProps {
+	id: string
+	name: string
+}
 
 interface SelectBoxProps {
 	label?: string
-	options: { key: string; value: string }[]
+	options: categoryProps[] | boardProps[]
 	placeholder?: string
 	selectedValue: string
 	disabled?: boolean
@@ -24,9 +35,16 @@ const SelectBox = ({
 			<Select value={selectedValue} onChange={handleChange} disabled={disabled}>
 				<Option value="">{placeholder}</Option>
 				{options.map((option) => (
-					<Option key={`select_${option.key}`} value={option.key}>
-						{option.value}
-					</Option>
+					<option
+						key={
+							'categoryId' in option
+								? `${option.categoryName}-${option.categoryId}`
+								: `${option.name}-${option.id}`
+						}
+						value={'categoryId' in option ? option.categoryId : option.id}
+					>
+						{'categoryName' in option ? option.categoryName : option.name}
+					</option>
 				))}
 			</Select>
 		</div>
@@ -40,10 +58,11 @@ const Label = styled.label`
 `
 
 const Select = styled.select`
-	height: 30px;
+	height: 33px;
 	width: 100%;
 	border-radius: 8px;
-	padding-left: 12px;
+	padding: 0 10px;
+	color: ${colors.commentGray};
 `
 
 const Option = styled.option``

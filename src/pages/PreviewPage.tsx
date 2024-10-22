@@ -4,14 +4,15 @@ import { ImagePlus } from 'lucide-react'
 import colors from '@/constants/color'
 import { fontSize, fontWeight } from '@/constants/font'
 import Button from '@components/Button'
-
-const postData = {
-	title: '언어모델 로봇 ML',
-	content:
-		'오늘날 머신러닝(machine learning, ML) 모델 개발은 대부분 NVIDIA의 데이터센터 GPU(예: A100)나 워크스테이션 GPU(예: RTX4090)가 장착된 고성능 서버 환경에서 이루어집니다. ',
-}
+import { useWriteStore } from '@/stores/writeStore'
+import useGoBack from '@/hooks/useGoBack'
 
 const PreviewPage = () => {
+	const title = useWriteStore((state) => state.title)
+	const content = useWriteStore((state) => state.content)
+	const thumbnail = useWriteStore((state) => state.thumbnailImg)
+	const handleBack = useGoBack()
+
 	return (
 		<Container>
 			<Title>게시물 미리보기</Title>
@@ -21,25 +22,35 @@ const PreviewPage = () => {
 						<span>재업로드</span>
 						<span>제거</span>
 					</div>
-					<div className="thumnail-upload">
-						<ImagePlus size={200} strokeWidth={1} color={colors.deleteGray} />
-						<form>
-							<label htmlFor="thumnailImg" className="img-label">
-								썸네일 업로드
-							</label>
-							<input type="file" accept="image/*" id="profileImg" className="img-input" />
-						</form>
+					<div
+						className="thumnail-upload"
+						style={{
+							backgroundImage: thumbnail ? `url(${thumbnail})` : 'none',
+							backgroundSize: 'cover',
+							backgroundPosition: 'center',
+						}}
+					>
+						{!thumbnail ? (
+							<ImagePlus size={200} strokeWidth={1} color={colors.deleteGray} />
+						) : (
+							<form>
+								<label htmlFor="thumbnailImg" className="img-label">
+									썸네일 업로드
+								</label>
+								<input type="file" accept="image/*" id="thumbnailImg" className="img-input" />
+							</form>
+						)}
 					</div>
 				</ThumnailContainer>
 				<Line />
 				<PostPreviewContainer>
-					<div className="post-title">{postData.title}</div>
-					<textarea defaultValue={postData.content} className="post-content" />
-					<span className="count">{postData.content.length}/150</span>
+					<div className="post-title">{title}</div>
+					<textarea defaultValue={content} className="post-content" />
+					<span className="count">{content.length}/150</span>
 				</PostPreviewContainer>
 			</PreviewContainer>
 			<ButtonContainer>
-				<Button variant="secondary" radius={50}>
+				<Button variant="secondary" radius={50} onClick={handleBack}>
 					취소
 				</Button>
 				<Button radius={50}>등록하기</Button>
