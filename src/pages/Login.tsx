@@ -20,7 +20,7 @@ const Login: React.FC = () => {
 	const getUser = async () => {
 		try {
 			const res = await axios.post(
-				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/auth/sessions',
+				`${import.meta.env.VITE_NUBBLE_SERVER}/auth/sessions`,
 				{
 					username: id,
 					password: pw,
