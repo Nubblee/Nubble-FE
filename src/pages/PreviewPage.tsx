@@ -9,6 +9,8 @@ import useWrite from '@/hooks/useWrite'
 import useFileUpload from '@/hooks/useFileUpload'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
+import axios from 'axios'
+import { ShowToast } from '@components/Toast'
 
 const PreviewPage = () => {
 	const {
@@ -24,6 +26,7 @@ const PreviewPage = () => {
 	const { uploadFile } = useFileUpload()
 	const fileRef = useRef<HTMLInputElement>(null)
 	const navigate = useNavigate()
+	const { sessionId } = useAuthStore()
 
 	const handleBack = useGoBack()
 
@@ -49,10 +52,32 @@ const PreviewPage = () => {
 		setDescription(e.target.value)
 	}
 
-	const handleSubmit = () => {
-		navigate(
-			`/postDetail/${boardId === 0 ? '코딩테스트' : '스터디'}/@${userId}/${encodeURIComponent(markdownTitle)}`,
-		)
+	const handleSubmit = async () => {
+		try {
+			await axios.post(
+				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/posts',
+				{
+					title: markdownTitle,
+					content: markdownContent,
+					boardId,
+					status: 'PUBLISHED',
+					thumbnailUrl: thumbnail,
+					description,
+				},
+				{
+					headers: {
+						'Content-Type': 'application/json',
+						'SESSION-ID': sessionId,
+					},
+				},
+			)
+			navigate(
+				`/postDetail/${boardId === 0 ? '코딩테스트' : '스터디'}/@${userId}/${encodeURIComponent(markdownTitle)}`,
+			)
+			ShowToast('게시물이 성공적으로 등록되었습니다.', 'success')
+		} catch (error) {
+			console.log('미리보기페이지 등록 에러 .................', error)
+		}
 	}
 
 	return (

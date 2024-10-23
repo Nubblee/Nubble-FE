@@ -9,6 +9,7 @@ import { formatDate } from '@/utils/formatDate'
 import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import useWrite from '@/hooks/useWrite'
+import Toast from '@components/Toast'
 
 const PostDetail = () => {
 	const { title, author } = useParams()
@@ -27,6 +28,7 @@ const PostDetail = () => {
 
 	return (
 		<Container>
+			<Toast />
 			<FloatingMenu />
 			{coteData.map((data) => (
 				<Wrapper key={`${data.title}-${data.author}`}>
