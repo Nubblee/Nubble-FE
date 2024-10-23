@@ -1,17 +1,44 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import styled from '@emotion/styled'
 import { ImagePlus } from 'lucide-react'
 import colors from '@/constants/color'
 import { fontSize, fontWeight } from '@/constants/font'
 import Button from '@components/Button'
-import { useWriteStore } from '@/stores/writeStore'
 import useGoBack from '@/hooks/useGoBack'
+import useWrite from '@/hooks/useWrite'
+import useFileUpload from '@/hooks/useFileUpload'
 
 const PreviewPage = () => {
-	const title = useWriteStore((state) => state.title)
-	const content = useWriteStore((state) => state.content)
-	const thumbnail = useWriteStore((state) => state.thumbnailImg)
+	const { markdownTitle, markdownContent, thumbnail, boardId, description, setThumbnail } =
+		useWrite()
+	const { uploadFile } = useFileUpload()
+	const fileRef = useRef<HTMLInputElement>(null)
+
 	const handleBack = useGoBack()
+
+	const handleThumnaileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0]
+		if (file) {
+			const res = await uploadFile(file)
+			setThumbnail(`![](${res.baseUrl + res.fileName})`)
+		}
+	}
+
+	const handleThumnailReupload = () => {
+		if (fileRef.current) {
+			fileRef.current.click()
+		}
+	}
+
+	const handleThumnailDelete = () => {
+		setThumbnail('')
+	}
+
+	console.log('썸네일url-------->', thumbnail)
+	console.log('Title---------->', markdownTitle)
+	console.log('내용--------->', markdownContent)
+	console.log('게시판 id---------->', boardId)
+	console.log('설명--------->', description)
 
 	return (
 		<Container>
@@ -19,8 +46,15 @@ const PreviewPage = () => {
 			<PreviewContainer>
 				<ThumnailContainer>
 					<div className="image-span">
-						<span>재업로드</span>
-						<span>제거</span>
+						<span onClick={handleThumnailReupload}>재업로드</span>
+						<input
+							type="file"
+							accept="image/*"
+							ref={fileRef}
+							style={{ display: 'none' }}
+							onChange={handleThumnaileChange}
+						/>
+						<span onClick={handleThumnailDelete}>제거</span>
 					</div>
 					<div
 						className="thumnail-upload"
@@ -30,23 +64,30 @@ const PreviewPage = () => {
 							backgroundPosition: 'center',
 						}}
 					>
-						{!thumbnail ? (
-							<ImagePlus size={200} strokeWidth={1} color={colors.deleteGray} />
-						) : (
-							<form>
-								<label htmlFor="thumbnailImg" className="img-label">
-									썸네일 업로드
-								</label>
-								<input type="file" accept="image/*" id="thumbnailImg" className="img-input" />
-							</form>
+						{!thumbnail && (
+							<>
+								<ImagePlus size={200} strokeWidth={1} color={colors.deleteGray} />
+								<form>
+									<label htmlFor="thumbnailImg" className="img-label">
+										썸네일 업로드
+									</label>
+									<input
+										type="file"
+										accept="image/*"
+										id="thumbnailImg"
+										className="img-input"
+										onChange={handleThumnaileChange}
+									/>
+								</form>
+							</>
 						)}
 					</div>
 				</ThumnailContainer>
 				<Line />
 				<PostPreviewContainer>
-					<div className="post-title">{title}</div>
-					<textarea defaultValue={content} className="post-content" />
-					<span className="count">{content.length}/150</span>
+					<div className="post-title">{markdownTitle}</div>
+					<textarea defaultValue={description} className="post-content" />
+					<span className="count">{description.length}/150</span>
 				</PostPreviewContainer>
 			</PreviewContainer>
 			<ButtonContainer>
@@ -82,6 +123,7 @@ const PreviewContainer = styled.div`
 `
 
 const ThumnailContainer = styled.div`
+	position: relative;
 	.thumnail-upload {
 		width: 456px;
 		height: 260px;
@@ -93,9 +135,10 @@ const ThumnailContainer = styled.div`
 	}
 
 	.image-span {
-		text-align: right;
+		position: absolute;
+		top: -30px;
+		left: 350px;
 		color: ${colors.commentGray};
-		margin-bottom: 10px;
 
 		span {
 			margin-left: 10px;
@@ -135,12 +178,14 @@ const Line = styled.div`
 `
 
 const PostPreviewContainer = styled.div`
-	margin-top: 10px;
+	position: relative;
+
 	.post-title {
+		position: absolute;
+		top: -50px;
 		font-size: ${fontSize.xxxl};
 		font-weight: ${fontWeight.bold};
 		color: #d9d9d9;
-		margin-bottom: 18px;
 	}
 
 	.post-content {
@@ -154,8 +199,10 @@ const PostPreviewContainer = styled.div`
 	}
 
 	.count {
+		position: absolute;
+		right: 0;
+		bottom: -30px;
 		display: block;
-		margin-top: 10px;
 		text-align: right;
 		color: ${colors.commentGray};
 	}
@@ -163,7 +210,9 @@ const PostPreviewContainer = styled.div`
 
 const ButtonContainer = styled.div`
 	width: 970px;
-	display: inline;
+	display: flex;
+	justify-content: end;
 	text-align: right;
+	gap: 10px;
 `
 export default PreviewPage
