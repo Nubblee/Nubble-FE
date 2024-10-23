@@ -14,6 +14,7 @@ export function ShowToast(message: string, toastType = 'success') {
 	} else {
 		toast.error(`${message}`, {
 			autoClose: 2000,
+			theme: 'dark',
 			draggable: true,
 		})
 	}
