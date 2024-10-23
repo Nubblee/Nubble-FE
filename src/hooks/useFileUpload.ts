@@ -9,17 +9,13 @@ const useFileUpload = () => {
 		try {
 			const formData = new FormData()
 			formData.append('file', file)
-
-			const res = await axios.post(
-				`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/files`,
-				formData,
-				{
-					headers: {
-						'Content-Type': 'multipart/form-data',
-						'SESSION-ID': sessionId,
-					},
+			console.log(`${import.meta.env.VITE_NUBBLE_SERVER}`)
+			const res = await axios.post(`${import.meta.env.VITE_NUBBLE_SERVER}/files`, formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data',
+					'SESSION-ID': sessionId,
 				},
-			)
+			})
 			return res.data
 		} catch (error) {
 			setFailed('파일 업로드 실패')

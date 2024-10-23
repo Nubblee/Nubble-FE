@@ -39,7 +39,7 @@ const testAuthor = [
 	},
 ]
 
-const headers = { Authorization: `${process.env.GITHUB_TOKEN}` }
+const headers = { Authorization: `${import.meta.env.VITE_GITHUB_TOKEN}` }
 //문제 제목 공백 제거, 소문자로 통일시키는 함수
 const normalizeString = (str: string) => {
 	return str
@@ -118,9 +118,7 @@ export const useCoteData = () => {
 
 	const fetchcoteDatas = async () => {
 		try {
-			const res = await axios.get(
-				`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/coding-problems`,
-			)
+			const res = await axios.get(`${import.meta.env.VITE_NUBBLE_SERVER}/coding-problems`)
 			setCoteDatas(res.data.problems)
 			fetchCommits()
 		} catch (error) {

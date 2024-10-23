@@ -119,20 +119,17 @@ const WritePage = () => {
 	}
 
 	const fetchCategory = async () => {
-		const res = await axios.get(
-			`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/categories`,
-			{
-				headers: {
-					'Content-Type': 'application/json',
-				},
+		const res = await axios.get(`${import.meta.env.VITE_NUBBLE_SERVER}/categories`, {
+			headers: {
+				'Content-Type': 'application/json',
 			},
-		)
+		})
 		setCategories(res.data.categories)
 	}
 
 	const fetchBoards = async (categoryId: string) => {
 		const res = await axios.get(
-			`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/categories/${categoryId}/boards`,
+			`${import.meta.env.VITE_NUBBLE_SERVER}/categories/${categoryId}/boards`,
 			{
 				headers: {
 					'Content-Type': 'application/json',
@@ -153,7 +150,7 @@ const WritePage = () => {
 	const handleDraft = async () => {
 		try {
 			const res = await axios.post(
-				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/posts',
+				`${import.meta.env.VITE_NUBBLE_SERVER}/posts`,
 				{
 					title: markdownTitle,
 					content: markdownContent,

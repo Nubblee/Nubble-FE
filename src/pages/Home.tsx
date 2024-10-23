@@ -72,15 +72,12 @@ const Home: React.FC = () => {
 				return
 			}
 
-			const res = await axios.get(
-				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/users/me',
-				{
-					headers: {
-						'Content-Type': 'application/json',
-						'SESSION-ID': sessionId,
-					},
+			const res = await axios.get(`${import.meta.env.VITE_NUBBLE_SERVER}/users/me`, {
+				headers: {
+					'Content-Type': 'application/json',
+					'SESSION-ID': sessionId,
 				},
-			)
+			})
 			console.log(res)
 			localStorage.setItem('userName', res.data.nickname)
 			localStorage.setItem('userId', res.data.username)

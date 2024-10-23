@@ -56,7 +56,7 @@ const PreviewPage = () => {
 	const handleSubmit = async () => {
 		try {
 			await axios.post(
-				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/posts',
+				`${import.meta.env.VITE_NUBBLE_SERVER}/posts`,
 				{
 					title: markdownTitle,
 					content: markdownContent,

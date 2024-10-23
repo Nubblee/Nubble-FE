@@ -12,14 +12,11 @@ const useCheckSession = () => {
 					return
 				}
 
-				await axios.get(
-					'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/auth/sessions/validate',
-					{
-						headers: {
-							'SESSION-ID': sessionId,
-						},
+				await axios.get(`${import.meta.env.VITE_NUBBLE_SERVER}/auth/sessions/validate`, {
+					headers: {
+						'SESSION-ID': sessionId,
 					},
-				)
+				})
 
 				console.log('로그인 된 상태')
 			} catch (error) {
