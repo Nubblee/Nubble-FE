@@ -7,12 +7,23 @@ import Button from '@components/Button'
 import useGoBack from '@/hooks/useGoBack'
 import useWrite from '@/hooks/useWrite'
 import useFileUpload from '@/hooks/useFileUpload'
+import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '@/stores/authStore'
 
 const PreviewPage = () => {
-	const { markdownTitle, markdownContent, thumbnail, boardId, description, setThumbnail } =
-		useWrite()
+	const {
+		markdownTitle,
+		markdownContent,
+		thumbnail,
+		boardId,
+		description,
+		setThumbnail,
+		setDescription,
+	} = useWrite()
+	const { userId } = useAuthStore()
 	const { uploadFile } = useFileUpload()
 	const fileRef = useRef<HTMLInputElement>(null)
+	const navigate = useNavigate()
 
 	const handleBack = useGoBack()
 
@@ -34,11 +45,15 @@ const PreviewPage = () => {
 		setThumbnail('')
 	}
 
-	console.log('썸네일url-------->', thumbnail)
-	console.log('Title---------->', markdownTitle)
-	console.log('내용--------->', markdownContent)
-	console.log('게시판 id---------->', boardId)
-	console.log('설명--------->', description)
+	const onChangeTextarea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		setDescription(e.target.value)
+	}
+
+	const handleSubmit = () => {
+		navigate(
+			`/postDetail/${boardId === 0 ? '코딩테스트' : '스터디'}/@${userId}/${encodeURIComponent(markdownTitle)}`,
+		)
+	}
 
 	return (
 		<Container>
@@ -86,7 +101,12 @@ const PreviewPage = () => {
 				<Line />
 				<PostPreviewContainer>
 					<div className="post-title">{markdownTitle}</div>
-					<textarea defaultValue={description} className="post-content" />
+					<textarea
+						placeholder="게시글 요약을 써주세요."
+						value={description}
+						onChange={onChangeTextarea}
+						className="post-content"
+					/>
 					<span className="count">{description.length}/150</span>
 				</PostPreviewContainer>
 			</PreviewContainer>
@@ -94,7 +114,9 @@ const PreviewPage = () => {
 				<Button variant="secondary" radius={50} onClick={handleBack}>
 					취소
 				</Button>
-				<Button radius={50}>등록하기</Button>
+				<Button radius={50} onClick={handleSubmit}>
+					등록하기
+				</Button>
 			</ButtonContainer>
 		</Container>
 	)

@@ -8,11 +8,13 @@ import { type FileContent, useCoteData } from '@/hooks/useCoteData'
 import { formatDate } from '@/utils/formatDate'
 import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import useWrite from '@/hooks/useWrite'
 
 const PostDetail = () => {
 	const { title, author } = useParams()
 	const { commitData } = useCoteData()
 	const [coteData, setCoteData] = useState<FileContent[]>([])
+	const { markdownTitle, markdownContent } = useWrite()
 
 	useEffect(() => {
 		if (commitData.length) {
