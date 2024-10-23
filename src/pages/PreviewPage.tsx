@@ -21,6 +21,7 @@ const PreviewPage = () => {
 		description,
 		setThumbnail,
 		setDescription,
+		reset,
 	} = useWrite()
 	const { userId } = useAuthStore()
 	const { uploadFile } = useFileUpload()
@@ -75,6 +76,7 @@ const PreviewPage = () => {
 				`/postDetail/${boardId === 0 ? '코딩테스트' : '스터디'}/@${userId}/${encodeURIComponent(markdownTitle)}`,
 			)
 			ShowToast('게시물이 성공적으로 등록되었습니다.', 'success')
+			reset()
 		} catch (error) {
 			console.log('미리보기페이지 등록 에러 .................', error)
 		}

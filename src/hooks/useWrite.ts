@@ -13,6 +13,16 @@ export default function useWrite() {
 	const setCategories = useWriteStore((state) => state.setCategory)
 	const setBoardId = useWriteStore((state) => state.setBoardId)
 	const setDescription = useWriteStore((state) => state.setDescription)
+
+	const reset = () => {
+		setTitle('')
+		setContent('')
+		setThumbnail('')
+		setDescription('')
+		setCategories([])
+		setBoardId(0)
+	}
+
 	return {
 		markdownContent,
 		markdownTitle,
@@ -26,5 +36,6 @@ export default function useWrite() {
 		setCategories,
 		setBoardId,
 		setDescription,
+		reset,
 	}
 }
