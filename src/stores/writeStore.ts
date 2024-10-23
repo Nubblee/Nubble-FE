@@ -5,11 +5,13 @@ interface writeState {
 	title: string
 	thumbnailImg: string
 	content: string
+	description: string
 	category: categoryProps[]
 	boardId: number
 	setTitle: (newTitle: string) => void
 	setThumbnail: (newContent: string) => void
 	setContent: (newContent: string) => void
+	setDescription: (newDescription: string) => void
 	setCategory: (newCategory: categoryProps[]) => void
 	setBoardId: (newBoard: number) => void
 }
@@ -18,6 +20,7 @@ export const useWriteStore = create<writeState>((set) => ({
 	title: '',
 	thumbnailImg: '',
 	content: '',
+	description: '',
 	category: [],
 	boardId: 0,
 	setTitle: (newTitle) => set({ title: newTitle }),
@@ -32,6 +35,7 @@ export const useWriteStore = create<writeState>((set) => ({
 			return state
 		})
 	},
+	setDescription: (newDescription) => set({ description: newDescription.slice(0, 150) }),
 	setCategory: (newCategory) =>
 		set((state) => {
 			return { ...state, category: newCategory }

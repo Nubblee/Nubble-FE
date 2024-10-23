@@ -57,6 +57,7 @@ const WritePage = () => {
 		setThumbnail,
 		setCategories,
 		setBoardId,
+		setDescription,
 	} = useWrite()
 	const { sessionId } = useAuthStore()
 
@@ -143,8 +144,9 @@ const WritePage = () => {
 
 	const handleSubmit = () => {
 		setTitle(markdownTitle)
-		setContent(markdownContent.slice(0, 150))
+		setContent(markdownContent)
 		setThumbnail(markdownContent)
+		setDescription(markdownContent)
 		navigate('/preview')
 	}
 

@@ -23,7 +23,7 @@ export const router = createBrowserRouter([
 				path: '/login',
 				element: <Login />, // 로그인 페이지 (헤더 없음)
 			},
-			{ path: '/postDetail/:author/:title', element: <PostDetail /> },
+			{ path: '/postDetail/:category/:author/:title', element: <PostDetail /> },
 			{
 				path: '/saves',
 				element: <Saves />,

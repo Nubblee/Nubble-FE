@@ -8,6 +8,7 @@ import { type FileContent, useCoteData } from '@/hooks/useCoteData'
 import { formatDate } from '@/utils/formatDate'
 import { useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import Toast from '@components/Toast'
 
 const PostDetail = () => {
 	const { title, author } = useParams()
@@ -25,6 +26,7 @@ const PostDetail = () => {
 
 	return (
 		<Container>
+			<Toast />
 			<FloatingMenu />
 			{coteData.map((data) => (
 				<Wrapper key={`${data.title}-${data.author}`}>
