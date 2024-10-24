@@ -2,26 +2,55 @@ import styled from '@emotion/styled'
 import colors from '@/constants/color'
 import { fontSize, fontWeight } from '@/constants/font'
 import { Trash2 } from 'lucide-react'
+import axios from 'axios'
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { formatDate } from '@/utils/formatDate'
 
 // 댓글 데이터의 타입을 정의
 interface Comment {
-	id: number
-	nickname: string
+	commentId: number
 	content: string
-	date: string
+	createdAt: Date
+	userId: number | null
+	userName: string | null
+	guestName: string | null
+	type: 'MEMBER' | 'GUEST'
 }
 
 const CommentList = () => {
-	const commentsData: Comment[] = [
-		{ id: 1, nickname: '하츄핑', content: '댓글 내용 1', date: '2024년 9월 12일' },
-		{ id: 2, nickname: '하츄핑', content: '댓글 내용 2', date: '2024년 9월 12일' },
-		{ id: 3, nickname: '하츄핑', content: '댓글 내용 3', date: '2024년 9월 12일' },
-	]
+	const { postId } = useParams<{ postId: string }>()
+	const [commentsData, setCommentsData] = useState<Comment[]>([]) // 서버에서 가져온 댓글 데이터를 저장하는 상태
+	const [error, setError] = useState<string | null>(null)
+
+	useEffect(() => {
+		const fetchComments = async () => {
+			try {
+				const res = await axios.get(
+					`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/posts/${postId}/comments`,
+				)
+				setCommentsData(res.data.comments) // 서버에서 받은 댓글 데이터를 상태에 저장
+			} catch (err) {
+				setError('댓글을 불러오는 중 오류가 발생했습니다.')
+				console.error(err)
+			}
+		}
+
+		fetchComments() // 컴포넌트가 마운트될 때 서버에서 댓글 데이터를 가져옴
+	}, [postId])
+
+	if (error) {
+		return <p>{error}</p>
+	}
+
+	if (!commentsData.length) {
+		return <p>댓글이 없습니다.</p>
+	}
 
 	return (
 		<List>
 			{commentsData.map((comment) => (
-				<CommentItem key={comment.id} comment={comment} />
+				<CommentItem key={comment.commentId} comment={comment} />
 			))}
 		</List>
 	)
@@ -31,8 +60,8 @@ const CommentItem = ({ comment }: { comment: Comment }) => {
 	return (
 		<Item>
 			<Header>
-				<Nickname>{comment.nickname}</Nickname>
-				<Date>{comment.date}</Date>
+				<Nickname>{comment.guestName}</Nickname>
+				<Date>{formatDate(comment.createdAt)}</Date>
 			</Header>
 			<Content>{comment.content}</Content>
 			<ActionButtons>

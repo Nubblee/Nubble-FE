@@ -4,10 +4,12 @@ import styled from '@emotion/styled'
 import React, { useState, useEffect } from 'react'
 import { useAuthStore } from '@/stores/authStore'
 import axios from 'axios'
+import { useParams } from 'react-router-dom'
 
 const MAX_NICKNAME_LENGTH = 6 // 닉네임 길이 제한
 
 const CommentForm = () => {
+	const { postId } = useParams<{ postId: string }>()
 	const { isLogin, userName } = useAuthStore()
 
 	// 닉네임, 비밀번호, 댓글 입력값 상태 관리
@@ -78,7 +80,7 @@ const CommentForm = () => {
 	const postGuestComment = async () => {
 		try {
 			const res = await axios.post(
-				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/posts/{postId}/comments/guest',
+				`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/posts/${postId}/comments/guest`,
 				{
 					content: formData.comment,
 					guestName: formData.nickname,
@@ -137,7 +139,6 @@ const CommentForm = () => {
 	)
 }
 
-// 스타일링
 const Form = styled.form`
 	display: flex;
 	flex-direction: column;
