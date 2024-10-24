@@ -162,9 +162,10 @@ const GlobalStyles = () => (
 				padding: 10px 15px;
 			}
 			pre {
-				background-color: ${colors.mainGray};
+				background-color: ${colors.bgBlack};
 				padding: 1em;
 				margin-bottom: 20px;
+				font-family: 'Pretendard Variable';
 			}
 			textarea,
 			#root {
