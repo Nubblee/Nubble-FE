@@ -3,12 +3,12 @@ import styled from '@emotion/styled'
 import colors from '@/constants/color'
 
 export interface categoryProps {
-	categoryId: string
+	categoryId: number
 	categoryName: string
 }
 
 export interface boardProps {
-	id: string
+	id: number
 	name: string
 }
 
@@ -16,7 +16,7 @@ interface SelectBoxProps {
 	label?: string
 	options: categoryProps[] | boardProps[]
 	placeholder?: string
-	selectedValue: string
+	selectedValue?: string
 	disabled?: boolean
 	handleChange: (e: ChangeEvent<HTMLSelectElement>) => void
 }
@@ -32,8 +32,12 @@ const SelectBox = ({
 	return (
 		<div>
 			{label && <Label>{label}</Label>}
-			<Select value={selectedValue} onChange={handleChange} disabled={disabled}>
-				<Option value="">{placeholder}</Option>
+			<Select value={selectedValue || ''} onChange={handleChange} disabled={disabled}>
+				{!selectedValue && (
+					<Option value="" disabled>
+						{placeholder}
+					</Option>
+				)}
 				{options.map((option) => (
 					<option
 						key={

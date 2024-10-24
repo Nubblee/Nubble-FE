@@ -1,25 +1,30 @@
-import { boardProps, categoryProps } from '@components/SelectBox'
 import { create } from 'zustand'
 
 interface writeState {
 	title: string
 	thumbnailImg: string
 	content: string
-	category: categoryProps[]
-	boardId: string
+	description: string
+	category: string
+	board: string
+	boardId: number
 	setTitle: (newTitle: string) => void
 	setThumbnail: (newContent: string) => void
 	setContent: (newContent: string) => void
-	setCategory: (newCategory: categoryProps[]) => void
-	setBoardId: (newBoard: string) => void
+	setDescription: (newDescription: string) => void
+	setCategory: (newCategory: string) => void
+	setBoard: (newSubCategory: string) => void
+	setBoardId: (newBoard: number) => void
 }
 
 export const useWriteStore = create<writeState>((set) => ({
 	title: '',
 	thumbnailImg: '',
 	content: '',
-	category: [],
-	boardId: '',
+	description: '',
+	category: '',
+	board: '',
+	boardId: 0,
 	setTitle: (newTitle) => set({ title: newTitle }),
 	setContent: (newContent) => set({ content: newContent }),
 	setThumbnail: (newContent) => {
@@ -32,9 +37,12 @@ export const useWriteStore = create<writeState>((set) => ({
 			return state
 		})
 	},
-	setCategory: (newCategory) =>
-		set((state) => {
-			return { ...state, category: newCategory }
-		}),
+	setDescription: (newDescription) => set({ description: newDescription.slice(0, 150) }),
+	setCategory: (newCategory) => {
+		set({ category: newCategory })
+	},
+	setBoard: (newSubCategory) => {
+		set({ board: newSubCategory })
+	},
 	setBoardId: (newBoard) => set({ boardId: newBoard }),
 }))

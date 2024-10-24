@@ -40,9 +40,7 @@ const AddQuestion = () => {
 	useEffect(() => {
 		const getCodingTestList = async () => {
 			try {
-				const res = await axios.get(
-					'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/coding-problems',
-				)
+				const res = await axios.get(`${import.meta.env.VITE_NUBBLE_SERVER}/coding-problems`)
 				const data = res.data.problems.map((problem: any) => ({
 					id: problem.problemId, // problemId 필드를 id로 저장
 					quizDate: problem.quizDate,
@@ -95,7 +93,7 @@ const AddQuestion = () => {
 	const postCodingTest = async () => {
 		try {
 			const res = await axios.post(
-				'http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/coding-problems',
+				`${import.meta.env.VITE_NUBBLE_SERVER}/coding-problems`,
 				{
 					quizDate: formData.quizDate,
 					problemTitle: formData.problemTitle,
@@ -119,14 +117,11 @@ const AddQuestion = () => {
 	const handleDelete = async (id: number) => {
 		try {
 			// DELETE 요청을 서버로 보냄
-			await axios.delete(
-				`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/coding-problems/${id}`,
-				{
-					headers: {
-						'SESSION-ID': sessionId,
-					},
+			await axios.delete(`${import.meta.env.VITE_NUBBLE_SERVER}/coding-problems/${id}`, {
+				headers: {
+					'SESSION-ID': sessionId,
 				},
-			)
+			})
 
 			// 성공적으로 삭제되면 클라이언트에서도 상태를 업데이트
 			const updatedQuestions = questions.filter((question) => question.id !== id)

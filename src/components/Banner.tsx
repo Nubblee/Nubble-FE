@@ -26,7 +26,7 @@ const Banner = () => {
 
 	const getCoteData = async () => {
 		const res = await axios.get(
-			`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/coding-problems?quizDate=${todayDate}`,
+			`${import.meta.env.VITE_NUBBLE_SERVER}/coding-problems?quizDate=${todayDate}`,
 		)
 		return res.data.problems
 	}
@@ -61,8 +61,9 @@ const Banner = () => {
 			<SwiperContainer>
 				<Swiper
 					slidesPerView={1}
+					slidesPerGroup={1}
 					spaceBetween={30}
-					loop={true}
+					loop={coteData.length > 0}
 					pagination={{
 						clickable: true,
 					}}
