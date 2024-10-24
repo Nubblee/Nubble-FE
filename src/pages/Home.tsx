@@ -73,7 +73,7 @@ const Home: React.FC = () => {
 				console.log(res.data.posts)
 				setStudyBoards(res.data.posts)
 			} catch (error) {
-				console.log('게시글 가져오기 에러------->', error)
+				console.log('스터디 게시글 가져오기 에러------->', error)
 			}
 		}
 
@@ -149,7 +149,7 @@ const Home: React.FC = () => {
 						<div className="study-posts">
 							<ul>
 								{studyBoards.map((data) => (
-									<Link to={`/postDetail/코딩테스트/@${data.username}/${data.title}`} key={data.id}>
+									<Link to={`/postDetail/스터디/@${data.username}/${data.title}`} key={data.id}>
 										<li className="post-list">
 											<img
 												src={data.thumbnailUrl !== '' ? data.thumbnailUrl : defaultImage}
@@ -222,6 +222,17 @@ const PostContainer = styled.div`
 				color: ${colors.white};
 			}
 		}
+	}
+
+	.cote-posts::-webkit-scrollbar,
+	.study-posts::-webkit-scrollbar {
+		width: 8px;
+	}
+
+	.cote-posts::-webkit-scrollbar-thumb,
+	.study-posts::-webkit-scrollbar-thumb {
+		background-color: ${colors.white};
+		border-radius: 4px;
 	}
 
 	.study-posts {
