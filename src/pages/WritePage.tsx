@@ -13,28 +13,8 @@ import useFileUpload from '@/hooks/useFileUpload'
 import { useWriteStore } from '@/stores/writeStore'
 import useWrite from '@/hooks/useWrite'
 import { useAuthStore } from '@/stores/authStore'
-
-interface Post {
-	markdownTitle: string
-	content: string
-	category: string
-	subCategory: string
-}
-
-const postsData: Record<string, Post> = {
-	1: {
-		markdownTitle: '나는 1번이다',
-		content: '나는 1번이다 이건 테스트임',
-		category: 'study',
-		subCategory: 'cs',
-	},
-	2: {
-		markdownTitle: '나는 2번이다',
-		content: '나는 2번이다 이건 아까와 똑같은 테스트임',
-		category: 'study',
-		subCategory: 'cs',
-	},
-}
+import { toast } from 'react-toastify'
+import Toast from '@components/Toast'
 
 const WritePage = () => {
 	const navigate = useNavigate()
@@ -44,21 +24,28 @@ const WritePage = () => {
 	const fileRef = useRef<HTMLInputElement>(null)
 	const readRef = useRef<HTMLDivElement>(null)
 	const [isEditing, setIsEditing] = useState(false)
-	const { selectedCategory, selectedSubCategory, handleSelectedData, handleSubData } = useCategory()
-	const { uploadFile } = useFileUpload()
-	const [boards, setBoards] = useState([])
+	const {
+		categories,
+		boards,
+		category,
+		board,
+		setCategory,
+		setBoard,
+		handleSelectedData,
+		handleSubData,
+	} = useCategory()
 	const {
 		markdownContent,
 		markdownTitle,
-		categories,
 		boardId,
 		setTitle,
 		setContent,
 		setThumbnail,
-		setCategories,
 		setBoardId,
 		setDescription,
+		reset,
 	} = useWrite()
+	const { uploadFile } = useFileUpload()
 	const { sessionId } = useAuthStore()
 
 	const handleUploadFile = () => {
@@ -111,32 +98,8 @@ const WritePage = () => {
 	}
 
 	const handleBack = () => {
-		setTitle('')
-		setContent('')
-		setThumbnail('')
-
+		reset()
 		navigate(-1)
-	}
-
-	const fetchCategory = async () => {
-		const res = await axios.get(`${import.meta.env.VITE_NUBBLE_SERVER}/categories`, {
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		})
-		setCategories(res.data.categories)
-	}
-
-	const fetchBoards = async (categoryId: string) => {
-		const res = await axios.get(
-			`${import.meta.env.VITE_NUBBLE_SERVER}/categories/${categoryId}/boards`,
-			{
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			},
-		)
-		setBoards(res.data.boards)
 	}
 
 	const handleSubmit = () => {
@@ -144,6 +107,8 @@ const WritePage = () => {
 		setContent(markdownContent)
 		setThumbnail(markdownContent)
 		setDescription(markdownContent)
+		setCategory(category)
+		setBoard(board)
 		navigate('/preview')
 	}
 
@@ -165,13 +130,12 @@ const WritePage = () => {
 					},
 				},
 			)
+			toast.success('임시저장이 완료되었습니다.✨')
 			return res
 		} catch (error) {
-			//임시저장 실패, 성공시 알림 모달 또는 토스트 알림 필요해보임
-			console.log('수정하기 에러', error)
+			toast.error('임시저장에 실패했는데요?😱')
 		}
 	}
-
 	// useEffect(() => {
 	// 	if (id) {
 	// 		setIsEditing(true)
@@ -186,18 +150,14 @@ const WritePage = () => {
 	// }, [id])
 
 	useEffect(() => {
-		fetchCategory()
-	}, [])
-
-	useEffect(() => {
-		if (selectedCategory) {
-			fetchBoards(selectedCategory)
-			setBoardId(Number(selectedCategory))
+		if (category) {
+			setBoardId(Number(category))
 		}
-	}, [selectedCategory])
+	}, [category])
 
 	return (
 		<Container>
+			<Toast />
 			<div className="area-write">
 				<input
 					className="write-markdownTitle"
@@ -222,16 +182,16 @@ const WritePage = () => {
 					<div className="select-category">
 						<SelectBox
 							options={categories}
-							selectedValue={selectedCategory}
+							selectedValue={category}
 							placeholder="카테고리 선택"
 							handleChange={handleSelectedData}
 						/>
 						<SelectBox
 							options={boards}
-							selectedValue={selectedSubCategory}
+							selectedValue={board}
 							placeholder="내용 선택"
 							handleChange={handleSubData}
-							disabled={!selectedCategory}
+							disabled={boards.length === 0 || !category}
 						/>
 					</div>
 				</div>
@@ -252,7 +212,7 @@ const WritePage = () => {
 							variant="secondary"
 							radius={50}
 							onClick={handleDraft}
-							disabled={!(markdownTitle && markdownContent)}
+							disabled={!(markdownTitle && markdownContent && category && board)}
 						>
 							임시저장
 						</Button>
@@ -262,7 +222,7 @@ const WritePage = () => {
 							<Button
 								radius={50}
 								onClick={handleSubmit}
-								disabled={!(markdownTitle && markdownContent)}
+								disabled={!(markdownTitle && markdownContent && category && board)}
 							>
 								등록하기
 							</Button>

@@ -27,5 +27,6 @@ export default function Toast() {
 export const StyledToastContainer = styled(ToastContainer)`
 	.Toastify__toast {
 		background-color: #3d3d3d;
+		color: #ffffff;
 	}
 `
