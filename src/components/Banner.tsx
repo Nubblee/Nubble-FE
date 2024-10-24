@@ -61,8 +61,9 @@ const Banner = () => {
 			<SwiperContainer>
 				<Swiper
 					slidesPerView={1}
+					slidesPerGroup={1}
 					spaceBetween={30}
-					loop={true}
+					loop={coteData.length > 0}
 					pagination={{
 						clickable: true,
 					}}
