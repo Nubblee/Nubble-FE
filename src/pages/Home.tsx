@@ -148,24 +148,26 @@ const Home: React.FC = () => {
 					{selectedTab === 'study' && (
 						<div className="study-posts">
 							<ul>
-								{studyBoards.map((data) => (
-									<Link to={`/postDetail/스터디/@${data.username}/${data.title}`} key={data.id}>
-										<li className="post-list">
-											<img
-												src={data.thumbnailUrl !== '' ? data.thumbnailUrl : defaultImage}
-												alt={data.title}
-											/>
-											<div>
-												<div className="post-info">
-													<div className="author">{data.username}</div>
-													<div className="date">{data.createdAt.slice(0, 10)}</div>
+								{studyBoards
+									.map((data) => (
+										<Link to={`/postDetail/스터디/@${data.username}/${data.title}`} key={data.id}>
+											<li className="post-list">
+												<img
+													src={data.thumbnailUrl !== '' ? data.thumbnailUrl : defaultImage}
+													alt={data.title}
+												/>
+												<div>
+													<div className="post-info">
+														<div className="author">{data.username}</div>
+														<div className="date">{data.createdAt.slice(0, 10)}</div>
+													</div>
+													<div className="title">{data.title}</div>
+													<div className="content">{data.description}</div>
 												</div>
-												<div className="title">{data.title}</div>
-												<div className="content">{data.description}</div>
-											</div>
-										</li>
-									</Link>
-								))}
+											</li>
+										</Link>
+									))
+									.reverse()}
 							</ul>
 						</div>
 					)}
