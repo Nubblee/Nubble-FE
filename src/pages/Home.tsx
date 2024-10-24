@@ -77,7 +77,7 @@ const Home: React.FC = () => {
 		}
 
 		getPost()
-	}, [studyBoards])
+	}, [])
 
 	return (
 		<Container>
@@ -123,7 +123,7 @@ const Home: React.FC = () => {
 							<ul>
 								{filteredCommitData.map((data) => (
 									<Link
-										to={`/postDetail/${data.author}/${data.title}`}
+										to={`/postDetail/코딩테스트/@${data.author}/${data.title}`}
 										key={`${data.title}-${data.author}`}
 									>
 										<li className="post-list">
@@ -148,17 +148,19 @@ const Home: React.FC = () => {
 						<div className="study-posts">
 							<ul>
 								{studyBoards.map((data) => (
-									<li className="post-list" key={data.id}>
-										<img src={data.thumbnailUrl} alt={data.title} />
-										<div>
-											<div className="post-info">
-												<div className="author">{data.username}</div>
-												<div className="date">{data.createdAt.slice(0, 10)}</div>
+									<Link to={`/postDetail/코딩테스트/@${data.username}/${data.title}`} key={data.id}>
+										<li className="post-list">
+											<img src={data.thumbnailUrl} alt={data.title} />
+											<div>
+												<div className="post-info">
+													<div className="author">{data.username}</div>
+													<div className="date">{data.createdAt.slice(0, 10)}</div>
+												</div>
+												<div className="title">{data.title}</div>
+												<div className="content">{data.description}</div>
 											</div>
-											<div className="title">{data.title}</div>
-											<div className="content">{data.description}</div>
-										</div>
-									</li>
+										</li>
+									</Link>
 								))}
 							</ul>
 						</div>
