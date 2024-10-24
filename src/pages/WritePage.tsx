@@ -14,6 +14,7 @@ import { useWriteStore } from '@/stores/writeStore'
 import useWrite from '@/hooks/useWrite'
 import { useAuthStore } from '@/stores/authStore'
 import { toast } from 'react-toastify'
+import Toast from '@components/Toast'
 
 const WritePage = () => {
 	const navigate = useNavigate()
@@ -156,6 +157,7 @@ const WritePage = () => {
 
 	return (
 		<Container>
+			<Toast />
 			<div className="area-write">
 				<input
 					className="write-markdownTitle"
