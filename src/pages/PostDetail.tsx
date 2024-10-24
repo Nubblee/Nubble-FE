@@ -1,61 +1,92 @@
 import colors from '@/constants/color'
 import { fontSize } from '@/constants/font'
+import { useAuthStore } from '@/stores/authStore'
+import { formatDate } from '@/utils/formatDate'
 import CommentForm from '@components/comment/CommentForm'
 import CommentList from '@components/comment/CommentList'
 import FloatingMenu from '@components/FloatingMenu'
-import styled from '@emotion/styled'
-import { type FileContent, useCoteData } from '@/hooks/useCoteData'
-import { formatDate } from '@/utils/formatDate'
-import { useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import RenderMarkdown from '@components/RenderMarkdown'
 import Toast from '@components/Toast'
+import styled from '@emotion/styled'
+import axios from 'axios'
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+
+interface PostData {
+	postId: number
+	createdAt: Date
+	title: string
+	content: string
+	thumbnailUrl: string
+	postStatus: 'PUBLISHED' | 'DRAFT'
+	userId: number
+	userNickname: string
+}
 
 const PostDetail = () => {
-	const { title, author } = useParams()
-	const { commitData } = useCoteData()
-	const [coteData, setCoteData] = useState<FileContent[]>([])
+	const { postId } = useParams<{ postId: string }>()
+	const [postData, setPostData] = useState<PostData | null>(null)
+	const [error, setError] = useState<string | null>(null)
+	const { sessionId } = useAuthStore()
 
 	useEffect(() => {
-		if (commitData.length) {
-			const filteredData = commitData.filter(
-				(data) => data.title === title && data.author === author,
-			)
-			setCoteData(filteredData)
+		const fetchPostData = async () => {
+			try {
+				const res = await axios.get(`${import.meta.env.VITE_NUBBLE_SERVER}/posts/${postId}`, {
+					headers: {
+						'SESSION-ID': sessionId,
+					},
+				})
+				setPostData(res.data)
+			} catch (err: unknown) {
+				if (axios.isAxiosError(err)) {
+					setError(err.response?.data?.message || '게시글을 가져오는 데 실패했습니다.')
+				} else {
+					setError('예상치 못한 에러가 발생했습니다.')
+				}
+				console.error(err)
+			}
 		}
-	}, [title, author, commitData])
+
+		fetchPostData()
+	}, [postId, sessionId])
+
+	if (error) {
+		return <p>{error}</p>
+	}
+
+	if (!postData) {
+		return <p>로딩 중...</p>
+	}
 
 	return (
 		<Container>
 			<Toast />
 			<FloatingMenu />
-			{coteData.map((data) => (
-				<Wrapper key={`${data.title}-${data.author}`}>
-					<TitleContainer>
-						<div>
-							<Title>{data.title}</Title>
-							<MetaData>
-								<DateName>
-									<span>{formatDate(data.date)}</span>
-									<span>{data.author}</span>
-								</DateName>
-								<EditDelete>
-									<button>수정</button>
-									<button>삭제</button>
-								</EditDelete>
-							</MetaData>
-						</div>
-					</TitleContainer>
-					{data.isCote ? (
-						<Content>
-							<pre>{data.content}</pre>
-						</Content>
-					) : (
-						<Content>{data.content}</Content>
-					)}
-					<CommentForm />
-					<CommentList />
-				</Wrapper>
-			))}
+			<Wrapper key={`${postData.title}-${postData.userNickname}`}>
+				<TitleContainer>
+					<div>
+						<Title>{postData.title}</Title>
+						<MetaData>
+							<DateName>
+								<span>{formatDate(postData.createdAt)}</span>
+								<span>{postData.userNickname}</span>
+							</DateName>
+							<EditDelete>
+								<button>수정</button>
+								<button>삭제</button>
+							</EditDelete>
+						</MetaData>
+					</div>
+				</TitleContainer>
+				<Content>
+					<pre>
+						<RenderMarkdown markdown={postData.content} />
+					</pre>
+				</Content>
+				<CommentForm />
+				<CommentList />
+			</Wrapper>
 		</Container>
 	)
 }
