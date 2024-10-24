@@ -10,6 +10,7 @@ import useCheckSession from '@/hooks/useCheckSession'
 import axios from 'axios'
 import { useCoteData } from '@/hooks/useCoteData'
 import { formatDate } from '@/utils/formatDate'
+import defaultImage from '@/assets/defaultImage.jpeg'
 
 interface Post {
 	createdAt: string
@@ -150,7 +151,10 @@ const Home: React.FC = () => {
 								{studyBoards.map((data) => (
 									<Link to={`/postDetail/코딩테스트/@${data.username}/${data.title}`} key={data.id}>
 										<li className="post-list">
-											<img src={data.thumbnailUrl} alt={data.title} />
+											<img
+												src={data.thumbnailUrl !== '' ? data.thumbnailUrl : defaultImage}
+												alt={data.title}
+											/>
 											<div>
 												<div className="post-info">
 													<div className="author">{data.username}</div>
