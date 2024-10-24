@@ -57,10 +57,12 @@ const CommentList = () => {
 }
 
 const CommentItem = ({ comment }: { comment: Comment }) => {
+	const displayName = comment.type === 'MEMBER' ? comment.userName : comment.guestName // 회원이면 userName, 게스트면 guestName 사용
+
 	return (
 		<Item>
 			<Header>
-				<Nickname>{comment.guestName}</Nickname>
+				<Nickname>{displayName}</Nickname> {/* 회원 또는 게스트 이름 표시 */}
 				<Date>{formatDate(comment.createdAt)}</Date>
 			</Header>
 			<Content>{comment.content}</Content>

@@ -11,6 +11,7 @@ const MAX_NICKNAME_LENGTH = 6 // 닉네임 길이 제한
 const CommentForm = () => {
 	const { postId } = useParams<{ postId: string }>()
 	const { isLogin, userName } = useAuthStore()
+	const { sessionId } = useAuthStore()
 
 	// 닉네임, 비밀번호, 댓글 입력값 상태 관리
 	const [formData, setFormData] = useState({
@@ -66,13 +67,36 @@ const CommentForm = () => {
 				console.log('비로그인 댓글 제출', res.data)
 			} else {
 				// 로그인된 상태일 때 다른 API 요청 로직 추가 (예: postComment)
-				console.log('Logged-in comment submitted:', submittedData)
+				const res = await postMemberComment()
+				console.log('비로그인 댓글 제출', res.data)
 			}
 			setSubmitSuccess(true)
 			setFormData({ nickname: '', password: '', comment: '' })
 		} catch (error) {
 			console.error('Error submitting comment:', error)
 			setSubmitSuccess(false)
+		}
+	}
+
+	//로그인 유저 댓글 작성
+	const postMemberComment = async () => {
+		try {
+			const res = await axios.post(
+				`http://nubble-backend-eb-1-env.eba-f5sb82hp.ap-northeast-2.elasticbeanstalk.com/posts/${postId}/comments/member`,
+				{
+					content: formData.comment,
+				},
+				{
+					headers: {
+						'Content-Type': 'application/json',
+						'SESSION-ID': sessionId,
+					},
+				},
+			)
+			return res
+		} catch (error) {
+			console.error('Error submitting member comment:', error)
+			throw error
 		}
 	}
 
