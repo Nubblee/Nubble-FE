@@ -63,7 +63,7 @@ const Banner = () => {
 					slidesPerView={1}
 					slidesPerGroup={1}
 					spaceBetween={30}
-					loop={coteData.length > 1}
+					loop={coteData.length > 0}
 					pagination={{
 						clickable: true,
 					}}
