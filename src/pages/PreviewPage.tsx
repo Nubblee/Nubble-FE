@@ -55,7 +55,7 @@ const PreviewPage = () => {
 
 	const handleSubmit = async () => {
 		try {
-			await axios.post(
+			const res = await axios.post(
 				`${import.meta.env.VITE_NUBBLE_SERVER}/posts`,
 				{
 					title: markdownTitle,
@@ -72,8 +72,10 @@ const PreviewPage = () => {
 					},
 				},
 			)
+			const { postId } = res.data
+			console.log(postId)
 			navigate(
-				`/postDetail/${boardId === 0 ? '코딩테스트' : '스터디'}/@${userId}/${encodeURIComponent(markdownTitle)}`,
+				`/postDetail/${boardId === 0 ? '코딩테스트' : '스터디'}/@${userId}/${encodeURIComponent(markdownTitle)}/${postId}`,
 			)
 			ShowToast('게시물이 성공적으로 등록되었습니다.', 'success')
 			reset()

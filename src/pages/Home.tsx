@@ -150,7 +150,10 @@ const Home: React.FC = () => {
 							<ul>
 								{studyBoards
 									.map((data) => (
-										<Link to={`/postDetail/스터디/@${data.username}/${data.title}`} key={data.id}>
+										<Link
+											to={`/postDetail/스터디/@${data.username}/${data.title}/${data.id}`}
+											key={data.id}
+										>
 											<li className="post-list">
 												<img
 													src={data.thumbnailUrl !== '' ? data.thumbnailUrl : defaultImage}
@@ -201,6 +204,7 @@ const PostContainer = styled.div`
 	border-right: 1px solid ${colors.white};
 
 	.cote-posts {
+		height: 100vh;
 		padding-right: 60px;
 		max-height: 80%;
 		overflow-y: auto;
@@ -226,18 +230,8 @@ const PostContainer = styled.div`
 		}
 	}
 
-	.cote-posts::-webkit-scrollbar,
-	.study-posts::-webkit-scrollbar {
-		width: 8px;
-	}
-
-	.cote-posts::-webkit-scrollbar-thumb,
-	.study-posts::-webkit-scrollbar-thumb {
-		background-color: ${colors.white};
-		border-radius: 4px;
-	}
-
 	.study-posts {
+		height: 100vh;
 		padding-right: 60px;
 		max-height: 80%;
 		overflow-y: auto;
@@ -281,7 +275,8 @@ const PostContainer = styled.div`
 			border-radius 0.3s ease;
 
 		img {
-			width: 154px;
+			min-width: 154px;
+			max-width: 154px;
 			height: 118px;
 			margin-right: 30px;
 		}
@@ -320,6 +315,17 @@ const PostContainer = styled.div`
 			border-radius: 10px;
 			transform: scale(1.01);
 		}
+	}
+
+	.cote-posts::-webkit-scrollbar,
+	.study-posts::-webkit-scrollbar {
+		width: 8px;
+	}
+
+	.cote-posts::-webkit-scrollbar-thumb,
+	.study-posts::-webkit-scrollbar-thumb {
+		background-color: ${colors.white};
+		border-radius: 4px;
 	}
 `
 
