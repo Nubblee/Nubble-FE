@@ -22,7 +22,7 @@ interface Post {
 }
 
 const Home: React.FC = () => {
-	useCheckSession()
+	// useCheckSession()
 	const { isLogin } = useAuthStore()
 	const navigate = useNavigate()
 	const login = useAuthStore((state) => state.login)
@@ -70,7 +70,7 @@ const Home: React.FC = () => {
 						'Content-Type': 'application/json',
 					},
 				})
-				console.log(res.data.posts)
+				// console.log(res.data.posts)
 				setStudyBoards(res.data.posts)
 			} catch (error) {
 				console.log('스터디 게시글 가져오기 에러------->', error)
@@ -276,6 +276,9 @@ const PostContainer = styled.div`
 		display: flex;
 		margin-bottom: 40px;
 		cursor: pointer;
+		transition:
+			transform 0.3s ease,
+			border-radius 0.3s ease;
 
 		img {
 			width: 154px;
@@ -315,7 +318,7 @@ const PostContainer = styled.div`
 				color: ${colors.white};
 			}
 			border-radius: 10px;
-			scale: 1;
+			transform: scale(1.01);
 		}
 	}
 `
